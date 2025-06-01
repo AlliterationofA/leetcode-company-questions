@@ -60,6 +60,28 @@ export default function LeetCodeAnalytics() {
   const [companyFilterMode, setCompanyFilterMode] = useState<"and" | "or">("or")
   const [topicFilterMode, setTopicFilterMode] = useState<"and" | "or">("or")
 
+  // Calculate min/max for range filters
+  const occurrencesStats = useMemo(() => {
+    if (!data) return { min: 1, max: 278 }
+    const values = data.questions.map(q => q.originalRows?.length || 0)
+    return { min: Math.min(...values), max: Math.max(...values) }
+  }, [data])
+  const frequencyStats = useMemo(() => {
+    if (!data) return { min: 5, max: 100 }
+    const values = data.questions.map(q => q.frequency || 0)
+    return { min: Math.min(...values), max: Math.max(...values) }
+  }, [data])
+  const acceptanceStats = useMemo(() => {
+    if (!data) return { min: 0, max: 100 }
+    const values = data.questions.map(q => q.acceptance_rate || 0)
+    return { min: Math.min(...values), max: Math.max(...values) }
+  }, [data])
+
+  // Filters and sorting
+  const [occurrencesRange, setOccurrencesRange] = useState<{ min: number | ""; max: number | "" }>({ min: "", max: "" })
+  const [frequencyRange, setFrequencyRange] = useState<{ min: number | ""; max: number | "" }>({ min: "", max: "" })
+  const [acceptanceRange, setAcceptanceRange] = useState<{ min: number | ""; max: number | "" }>({ min: "", max: "" })
+
   // Clear success message after 5 seconds
   useEffect(() => {
     if (success) {
@@ -188,10 +210,21 @@ export default function LeetCodeAnalytics() {
         showMultiCompany,
         companyFilterMode,
         topicFilterMode,
+        occurrencesRange,
+        frequencyRange,
+        acceptanceRange,
       },
     })
 
-    // Filter questions based on their original CSV rows
+    // Get effective min/max for each range
+    const occMin = occurrencesRange.min === "" ? occurrencesStats.min : occurrencesRange.min
+    const occMax = occurrencesRange.max === "" ? occurrencesStats.max : occurrencesRange.max
+    const freqMin = frequencyRange.min === "" ? frequencyStats.min : frequencyRange.min
+    const freqMax = frequencyRange.max === "" ? frequencyStats.max : frequencyRange.max
+    const accMin = acceptanceRange.min === "" ? acceptanceStats.min : acceptanceRange.min
+    const accMax = acceptanceRange.max === "" ? acceptanceStats.max : acceptanceRange.max
+
+    // Filter questions based on their original CSV rows to maintain data integrity
     const filtered = data.questions.filter((question) => {
       // Check if any of the original rows match the filters
       const hasMatchingRow = question.originalRows?.some((row) => {
@@ -245,6 +278,13 @@ export default function LeetCodeAnalytics() {
           }
         }
 
+        // Occurrences filter
+        const occurrences = question.originalRows?.length || 0
+        if (occurrences < occMin || occurrences > occMax) return false
+        // Frequency filter
+        if (question.frequency < freqMin || question.frequency > freqMax) return false
+        // Acceptance filter
+        if (question.acceptance_rate < accMin || question.acceptance_rate > accMax) return false
         return true
       })
 
@@ -313,6 +353,12 @@ export default function LeetCodeAnalytics() {
     showMultiCompany,
     companyFilterMode,
     topicFilterMode,
+    occurrencesRange,
+    frequencyRange,
+    acceptanceRange,
+    occurrencesStats,
+    frequencyStats,
+    acceptanceStats,
   ])
 
   if (loading) {
@@ -498,6 +544,15 @@ export default function LeetCodeAnalytics() {
                 onCompanyFilterModeChange={setCompanyFilterMode}
                 topicFilterMode={topicFilterMode}
                 onTopicFilterModeChange={setTopicFilterMode}
+                occurrencesRange={occurrencesRange}
+                onOccurrencesRangeChange={setOccurrencesRange}
+                frequencyRange={frequencyRange}
+                onFrequencyRangeChange={setFrequencyRange}
+                acceptanceRange={acceptanceRange}
+                onAcceptanceRangeChange={setAcceptanceRange}
+                occurrencesStats={occurrencesStats}
+                frequencyStats={frequencyStats}
+                acceptanceStats={acceptanceStats}
               />
 
               {/* Problems Table */}

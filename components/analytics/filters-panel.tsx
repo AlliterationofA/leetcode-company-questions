@@ -1,6 +1,6 @@
 "use client"
 
-import { Filter, Building2, Gauge, Clock, Tag, Search, X, Layers, GitBranch, Check, ChevronsUpDown } from "lucide-react"
+import { Filter, Building2, Gauge, Clock, Tag, Search, X, Layers, GitBranch, Check, ChevronsUpDown, Hash, BarChart, CheckCircle } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -33,6 +33,15 @@ interface FiltersPanelProps {
   onCompanyFilterModeChange: (mode: "and" | "or") => void
   topicFilterMode: "and" | "or"
   onTopicFilterModeChange: (mode: "and" | "or") => void
+  occurrencesRange: { min: number | ""; max: number | "" }
+  onOccurrencesRangeChange: (range: { min: number | ""; max: number | "" }) => void
+  frequencyRange: { min: number | ""; max: number | "" }
+  onFrequencyRangeChange: (range: { min: number | ""; max: number | "" }) => void
+  acceptanceRange: { min: number | ""; max: number | "" }
+  onAcceptanceRangeChange: (range: { min: number | ""; max: number | "" }) => void
+  occurrencesStats: { min: number; max: number }
+  frequencyStats: { min: number; max: number }
+  acceptanceStats: { min: number; max: number }
 }
 
 export function FiltersPanel({
@@ -56,6 +65,15 @@ export function FiltersPanel({
   onCompanyFilterModeChange,
   topicFilterMode,
   onTopicFilterModeChange,
+  occurrencesRange,
+  onOccurrencesRangeChange,
+  frequencyRange,
+  onFrequencyRangeChange,
+  acceptanceRange,
+  onAcceptanceRangeChange,
+  occurrencesStats,
+  frequencyStats,
+  acceptanceStats,
 }: FiltersPanelProps) {
   const [openCompany, setOpenCompany] = useState(false)
   const [openTopic, setOpenTopic] = useState(false)
@@ -105,6 +123,7 @@ export function FiltersPanel({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Row 1: Main dropdown filters */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Companies Filter */}
           <div className="space-y-2">
@@ -469,21 +488,102 @@ export function FiltersPanel({
             )}
           </div>
         </div>
-
-        <div className="flex items-center gap-4">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant={showMultiCompany ? "default" : "outline"} size="sm" onClick={onMultiCompanyToggle}>
-                  <Filter className="h-4 w-4 mr-2" />
-                  Cross-Company Only
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Show only problems that appear in multiple companies</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+        {/* Row 2: Range filters and cross-company button */}
+        <div className="flex flex-col lg:flex-row gap-4 items-start mt-2">
+          <div className="flex flex-1 gap-4">
+            {/* Occurrences Range */}
+            <div>
+              <label className="block text-xs font-semibold text-muted-foreground mb-1 flex items-center gap-1">
+                <Hash className="h-4 w-4" /> Occurrences
+              </label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  placeholder={occurrencesStats.min.toString()}
+                  value={occurrencesRange.min === "" ? occurrencesStats.min : occurrencesRange.min}
+                  min={0}
+                  className="w-20 h-10"
+                  onChange={e => onOccurrencesRangeChange({ min: e.target.value === "" ? "" : Number(e.target.value), max: occurrencesRange.max })}
+                />
+                <span className="text-muted-foreground">—</span>
+                <Input
+                  type="number"
+                  placeholder={occurrencesStats.max.toString()}
+                  value={occurrencesRange.max === "" ? occurrencesStats.max : occurrencesRange.max}
+                  min={0}
+                  className="w-20 h-10"
+                  onChange={e => onOccurrencesRangeChange({ min: occurrencesRange.min, max: e.target.value === "" ? "" : Number(e.target.value) })}
+                />
+              </div>
+            </div>
+            {/* Frequency Range */}
+            <div>
+              <label className="block text-xs font-semibold text-muted-foreground mb-1 flex items-center gap-1">
+                <BarChart className="h-4 w-4" /> Frequency
+              </label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  placeholder={frequencyStats.min.toString()}
+                  value={frequencyRange.min === "" ? frequencyStats.min : frequencyRange.min}
+                  min={0}
+                  className="w-20 h-10"
+                  onChange={e => onFrequencyRangeChange({ min: e.target.value === "" ? "" : Number(e.target.value), max: frequencyRange.max })}
+                />
+                <span className="text-muted-foreground">—</span>
+                <Input
+                  type="number"
+                  placeholder={frequencyStats.max.toString()}
+                  value={frequencyRange.max === "" ? frequencyStats.max : frequencyRange.max}
+                  min={0}
+                  className="w-20 h-10"
+                  onChange={e => onFrequencyRangeChange({ min: frequencyRange.min, max: e.target.value === "" ? "" : Number(e.target.value) })}
+                />
+              </div>
+            </div>
+            {/* Acceptance % Range */}
+            <div>
+              <label className="block text-xs font-semibold text-muted-foreground mb-1 flex items-center gap-1">
+                <CheckCircle className="h-4 w-4" /> Acceptance %
+              </label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  placeholder={acceptanceStats.min.toString()}
+                  value={acceptanceRange.min === "" ? acceptanceStats.min : acceptanceRange.min}
+                  min={0}
+                  max={100}
+                  className="w-20 h-10"
+                  onChange={e => onAcceptanceRangeChange({ min: e.target.value === "" ? "" : Number(e.target.value), max: acceptanceRange.max })}
+                />
+                <span className="text-muted-foreground">—</span>
+                <Input
+                  type="number"
+                  placeholder={acceptanceStats.max.toString()}
+                  value={acceptanceRange.max === "" ? acceptanceStats.max : acceptanceRange.max}
+                  min={0}
+                  max={100}
+                  className="w-20 h-10"
+                  onChange={e => onAcceptanceRangeChange({ min: acceptanceRange.min, max: e.target.value === "" ? "" : Number(e.target.value) })}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex-shrink-0 mt-2 lg:mt-0">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant={showMultiCompany ? "default" : "outline"} size="sm" onClick={onMultiCompanyToggle}>
+                    <Filter className="h-4 w-4 mr-2" />
+                    Cross-Company Only
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Show only problems that appear in multiple companies</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </div>
       </CardContent>
     </Card>
