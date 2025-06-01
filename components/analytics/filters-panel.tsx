@@ -219,58 +219,77 @@ export function FiltersPanel({
           {/* Difficulties Filter */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <div className="w-full">
-                <div className="flex items-center gap-2 mb-2">
-                  <Gauge className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Difficulty</span>
-                </div>
-                <div className="flex gap-2">
-                  {availableDifficulties.map((difficulty) => {
-                    const isSelected = selectedDifficulties.includes(difficulty)
-                    const diff = difficulty.toUpperCase()
-                    const colorClass =
-                      diff === "EASY"
-                        ? isSelected
-                          ? "bg-green-600 border-green-700 text-white"
-                          : "border border-green-200 text-green-600 bg-white hover:bg-green-50"
-                        : diff === "MEDIUM"
-                        ? isSelected
-                          ? "bg-yellow-500 border-yellow-600 text-white"
-                          : "border border-yellow-200 text-yellow-600 bg-white hover:bg-yellow-50"
-                        : diff === "HARD"
-                        ? isSelected
-                          ? "bg-red-600 border-red-700 text-white"
-                          : "border border-red-200 text-red-600 bg-white hover:bg-red-50"
-                        : ""
-                    return (
-                      <Button
-                        key={difficulty}
-                        variant="ghost"
-                        size="sm"
-                        className={cn(
-                          "h-8 px-4 font-bold rounded-full transition-colors text-xs border",
-                          colorClass
-                        )}
-                        style={{ boxShadow: "none" }}
-                        onClick={() => {
-                          if (isSelected) {
-                            onDifficultiesChange(selectedDifficulties.filter(d => d !== difficulty))
-                          } else {
-                            onDifficultiesChange([...selectedDifficulties, difficulty])
-                          }
-                        }}
-                      >
-                        {difficulty}
-                        {isSelected && (
-                          <span className="ml-2 flex items-center">
-                            <X className="h-3 w-3" />
-                          </span>
-                        )}
-                      </Button>
-                    )
-                  })}
-                </div>
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Gauge className="h-4 w-4 text-muted-foreground" />
+                      {selectedDifficulties.length > 0
+                        ? selectedDifficulties.length === 1
+                          ? selectedDifficulties[0]
+                          : `${selectedDifficulties.length} selected`
+                        : "Select difficulty"}
+                    </div>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-0" align="start">
+                  <Command>
+                    <CommandGroup>
+                      <div className="flex flex-wrap gap-2 p-2">
+                        {availableDifficulties.map((difficulty) => {
+                          const isSelected = selectedDifficulties.includes(difficulty)
+                          const diff = difficulty.toUpperCase()
+                          const colorClass =
+                            diff === "EASY"
+                              ? isSelected
+                                ? "bg-green-600 text-white border-green-700"
+                                : "border border-green-200 text-green-600 bg-white hover:bg-green-50"
+                              : diff === "MEDIUM"
+                              ? isSelected
+                                ? "bg-yellow-500 text-white border-yellow-600"
+                                : "border border-yellow-200 text-yellow-600 bg-white hover:bg-yellow-50"
+                              : diff === "HARD"
+                              ? isSelected
+                                ? "bg-red-600 text-white border-red-700"
+                                : "border border-red-200 text-red-600 bg-white hover:bg-red-50"
+                              : ""
+                          return (
+                            <Button
+                              key={difficulty}
+                              variant="ghost"
+                              size="sm"
+                              className={cn(
+                                "h-8 px-4 font-bold rounded-full transition-colors text-xs border",
+                                colorClass
+                              )}
+                              style={{ boxShadow: "none" }}
+                              onClick={() => {
+                                if (isSelected) {
+                                  onDifficultiesChange(selectedDifficulties.filter(d => d !== difficulty))
+                                } else {
+                                  onDifficultiesChange([...selectedDifficulties, difficulty])
+                                }
+                              }}
+                            >
+                              {difficulty}
+                              {isSelected && (
+                                <span className="ml-2 flex items-center">
+                                  <X className="h-3 w-3" />
+                                </span>
+                              )}
+                            </Button>
+                          )
+                        })}
+                      </div>
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 
