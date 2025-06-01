@@ -145,7 +145,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0" align="start">
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
                   <Command>
                     <CommandInput
                       placeholder="Search companies..."
@@ -256,7 +256,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0" align="start">
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
                   <Command>
                     <CommandGroup>
                       <div className="flex flex-wrap gap-2 p-2">
@@ -331,7 +331,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0" align="start">
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
                   <Command>
                     <CommandGroup className="max-h-[300px] overflow-auto p-2">
                       <div className="flex flex-wrap gap-2">
@@ -398,7 +398,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0" align="start">
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
                   <Command>
                     <CommandInput
                       placeholder="Search topics..."
