@@ -424,7 +424,15 @@ export default function LeetCodeAnalytics() {
                   <Input
                     placeholder="Search problems or topics..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      if (e.target.value) {
+                        const problemsSection = document.getElementById('problems-section');
+                        if (problemsSection) {
+                          problemsSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }
+                    }}
                     className="pl-10 w-[500px]"
                   />
                 </div>
@@ -551,7 +559,7 @@ export default function LeetCodeAnalytics() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="problems" className="space-y-6">
+            <TabsContent value="problems" className="space-y-6" id="problems-section">
               {/* Filters */}
               <FiltersPanel
                 selectedCompanies={selectedCompanies}
