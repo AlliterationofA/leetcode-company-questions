@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 
 interface FiltersPanelProps {
   selectedCompanies: string[]
@@ -70,14 +70,6 @@ export function FiltersPanel({
     showMultiCompany,
   ].filter(Boolean).length
 
-  const filteredCompanies = availableCompanies
-    .filter(company => company.toLowerCase().includes(companySearch.toLowerCase()))
-    .sort((a, b) => a.localeCompare(b))
-
-  const filteredTopics = availableTopics
-    .filter(topic => topic.toLowerCase().includes(topicSearch.toLowerCase()))
-    .sort((a, b) => a.localeCompare(b))
-
   const removeCompany = (company: string) => {
     onCompaniesChange(selectedCompanies.filter(c => c !== company))
   }
@@ -134,7 +126,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
+                <PopoverContent className="w-[300px] p-0" align="start">
                   <Command>
                     <CommandInput
                       placeholder="Search companies..."
@@ -143,25 +135,34 @@ export function FiltersPanel({
                     />
                     <CommandEmpty>No companies found.</CommandEmpty>
                     <CommandGroup>
-                      {filteredCompanies.map((company) => (
-                        <CommandItem
-                          key={company}
-                          onSelect={() => {
-                            const newSelection = selectedCompanies.includes(company)
-                              ? selectedCompanies.filter(c => c !== company)
-                              : [...selectedCompanies, company]
-                            onCompaniesChange(newSelection)
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              selectedCompanies.includes(company) ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {company}
-                        </CommandItem>
-                      ))}
+                      <div className="flex flex-wrap gap-2 p-2">
+                        {availableCompanies
+                          .sort((a, b) => a.localeCompare(b))
+                          .map((company) => (
+                          <CommandItem
+                            key={company}
+                            value={company}
+                            onSelect={() => {
+                              const newSelection = selectedCompanies.includes(company)
+                                ? selectedCompanies.filter(c => c !== company)
+                                : [...selectedCompanies, company]
+                              onCompaniesChange(newSelection)
+                            }}
+                            className="p-0"
+                          >
+                            <Button
+                              variant={selectedCompanies.includes(company) ? "default" : "outline"}
+                              size="sm"
+                              className="h-7"
+                            >
+                              {company}
+                              {selectedCompanies.includes(company) && (
+                                <X className="h-3 w-3 ml-1" />
+                              )}
+                            </Button>
+                          </CommandItem>
+                        ))}
+                      </div>
                     </CommandGroup>
                   </Command>
                 </PopoverContent>
@@ -200,19 +201,16 @@ export function FiltersPanel({
             {selectedCompanies.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {selectedCompanies.map((company) => (
-                  <Badge
+                  <Button
                     key={company}
                     variant="secondary"
-                    className="flex items-center gap-1 px-2 py-1"
+                    size="sm"
+                    className="h-7 px-2"
+                    onClick={() => removeCompany(company)}
                   >
                     {company}
-                    <button
-                      onClick={() => removeCompany(company)}
-                      className="ml-1 hover:bg-muted rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
+                    <X className="h-3 w-3 ml-1" />
+                  </Button>
                 ))}
               </div>
             )}
@@ -220,91 +218,123 @@ export function FiltersPanel({
 
           {/* Difficulties Filter */}
           <div className="space-y-2">
-            <Select
-              value={selectedDifficulties.length > 0 ? selectedDifficulties[0] : "all"}
-              onValueChange={(value) => {
-                if (value === "all") {
-                  onDifficultiesChange([])
-                } else {
-                  onDifficultiesChange([value])
-                }
-              }}
-            >
-              <SelectTrigger className="flex items-center gap-2">
-                <Gauge className="h-4 w-4 text-muted-foreground" />
-                <SelectValue placeholder="Filter by difficulty" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Difficulties</SelectItem>
-                {availableDifficulties.map((difficulty) => (
-                  <SelectItem key={difficulty} value={difficulty}>
-                    {difficulty}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {selectedDifficulties.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {selectedDifficulties.map((difficulty) => (
-                  <Badge
-                    key={difficulty}
-                    variant="secondary"
-                    className="flex items-center gap-1 px-2 py-1"
-                  >
-                    {difficulty}
-                    <button
-                      onClick={() => removeDifficulty(difficulty)}
-                      className="ml-1 hover:bg-muted rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
+            <div className="flex items-center gap-2">
+              <div className="w-full">
+                <div className="flex items-center gap-2 mb-2">
+                  <Gauge className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Difficulty</span>
+                </div>
+                <div className="flex gap-2">
+                  {availableDifficulties.map((difficulty) => {
+                    const isSelected = selectedDifficulties.includes(difficulty)
+                    const diff = difficulty.toUpperCase()
+                    const colorClass =
+                      diff === "EASY"
+                        ? isSelected
+                          ? "bg-green-600 border-green-700 text-white"
+                          : "border border-green-200 text-green-600 bg-white hover:bg-green-50"
+                        : diff === "MEDIUM"
+                        ? isSelected
+                          ? "bg-yellow-500 border-yellow-600 text-white"
+                          : "border border-yellow-200 text-yellow-600 bg-white hover:bg-yellow-50"
+                        : diff === "HARD"
+                        ? isSelected
+                          ? "bg-red-600 border-red-700 text-white"
+                          : "border border-red-200 text-red-600 bg-white hover:bg-red-50"
+                        : ""
+                    return (
+                      <Button
+                        key={difficulty}
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "h-8 px-4 font-bold rounded-full transition-colors text-xs border",
+                          colorClass
+                        )}
+                        style={{ boxShadow: "none" }}
+                        onClick={() => {
+                          if (isSelected) {
+                            onDifficultiesChange(selectedDifficulties.filter(d => d !== difficulty))
+                          } else {
+                            onDifficultiesChange([...selectedDifficulties, difficulty])
+                          }
+                        }}
+                      >
+                        {difficulty}
+                        {isSelected && (
+                          <span className="ml-2 flex items-center">
+                            <X className="h-3 w-3" />
+                          </span>
+                        )}
+                      </Button>
+                    )
+                  })}
+                </div>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Timeframes Filter */}
           <div className="space-y-2">
-            <Select
-              value={selectedTimeframes.length > 0 ? selectedTimeframes[0] : "all"}
-              onValueChange={(value) => {
-                if (value === "all") {
-                  onTimeframesChange([])
-                } else {
-                  onTimeframesChange([value])
-                }
-              }}
-            >
-              <SelectTrigger className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <SelectValue placeholder="Filter by timeframe" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Timeframes</SelectItem>
-                {availableTimeframes.map((timeframe) => (
-                  <SelectItem key={timeframe} value={timeframe}>
-                    {timeframe}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      {selectedTimeframes.length > 0
+                        ? `${selectedTimeframes.length} selected`
+                        : "Select timeframe"}
+                    </div>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-0" align="start">
+                  <Command>
+                    <CommandGroup className="max-h-[300px] overflow-auto p-2">
+                      <div className="flex flex-wrap gap-2">
+                        {availableTimeframes.map((timeframe) => (
+                          <Button
+                            key={timeframe}
+                            variant={selectedTimeframes.includes(timeframe) ? "default" : "outline"}
+                            size="sm"
+                            className="h-7"
+                            onClick={() => {
+                              const newSelection = selectedTimeframes.includes(timeframe)
+                                ? selectedTimeframes.filter(t => t !== timeframe)
+                                : [...selectedTimeframes, timeframe]
+                              onTimeframesChange(newSelection)
+                            }}
+                          >
+                            {timeframe}
+                            {selectedTimeframes.includes(timeframe) && (
+                              <X className="h-3 w-3 ml-1" />
+                            )}
+                          </Button>
+                        ))}
+                      </div>
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
             {selectedTimeframes.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {selectedTimeframes.map((timeframe) => (
-                  <Badge
+                  <Button
                     key={timeframe}
                     variant="secondary"
-                    className="flex items-center gap-1 px-2 py-1"
+                    size="sm"
+                    className="h-7 px-2"
+                    onClick={() => removeTimeframe(timeframe)}
                   >
                     {timeframe}
-                    <button
-                      onClick={() => removeTimeframe(timeframe)}
-                      className="ml-1 hover:bg-muted rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
+                    <X className="h-3 w-3 ml-1" />
+                  </Button>
                 ))}
               </div>
             )}
@@ -330,7 +360,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
+                <PopoverContent className="w-[300px] p-0" align="start">
                   <Command>
                     <CommandInput
                       placeholder="Search topics..."
@@ -339,25 +369,34 @@ export function FiltersPanel({
                     />
                     <CommandEmpty>No topics found.</CommandEmpty>
                     <CommandGroup>
-                      {filteredTopics.map((topic) => (
-                        <CommandItem
-                          key={topic}
-                          onSelect={() => {
-                            const newSelection = selectedTopics.includes(topic)
-                              ? selectedTopics.filter(t => t !== topic)
-                              : [...selectedTopics, topic]
-                            onTopicsChange(newSelection)
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              selectedTopics.includes(topic) ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {topic}
-                        </CommandItem>
-                      ))}
+                      <div className="flex flex-wrap gap-2 p-2">
+                        {availableTopics
+                          .sort((a, b) => a.localeCompare(b))
+                          .map((topic) => (
+                          <CommandItem
+                            key={topic}
+                            value={topic}
+                            onSelect={() => {
+                              const newSelection = selectedTopics.includes(topic)
+                                ? selectedTopics.filter(t => t !== topic)
+                                : [...selectedTopics, topic]
+                              onTopicsChange(newSelection)
+                            }}
+                            className="p-0"
+                          >
+                            <Button
+                              variant={selectedTopics.includes(topic) ? "default" : "outline"}
+                              size="sm"
+                              className="h-7"
+                            >
+                              {topic}
+                              {selectedTopics.includes(topic) && (
+                                <X className="h-3 w-3 ml-1" />
+                              )}
+                            </Button>
+                          </CommandItem>
+                        ))}
+                      </div>
                     </CommandGroup>
                   </Command>
                 </PopoverContent>
@@ -396,19 +435,16 @@ export function FiltersPanel({
             {selectedTopics.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {selectedTopics.map((topic) => (
-                  <Badge
+                  <Button
                     key={topic}
                     variant="secondary"
-                    className="flex items-center gap-1 px-2 py-1"
+                    size="sm"
+                    className="h-7 px-2"
+                    onClick={() => removeTopic(topic)}
                   >
                     {topic}
-                    <button
-                      onClick={() => removeTopic(topic)}
-                      className="ml-1 hover:bg-muted rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
+                    <X className="h-3 w-3 ml-1" />
+                  </Button>
                 ))}
               </div>
             )}
