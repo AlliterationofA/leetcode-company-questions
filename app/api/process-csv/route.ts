@@ -70,7 +70,7 @@ export async function POST(request: Request) {
       console.log("Fetching CSV data from GitHub repository...")
       try {
         const response = await fetch(
-          "https://raw.githubusercontent.com/AlliterationofA/LeetcodeAnalyticsBackend/main/leetcode_company_questions.csv",
+          "https://raw.githubusercontent.com/AlliterationofA/LeetcodeAnalyticsBackend/main/codedata.csv",
         )
         if (!response.ok) {
           throw new Error(`Failed to fetch CSV data: ${response.status}`)
