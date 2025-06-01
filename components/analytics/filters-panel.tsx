@@ -585,7 +585,7 @@ export function FiltersPanel({
                 <TooltipTrigger asChild>
                   <Button variant={showMultiCompany ? "default" : "outline"} size="sm" onClick={onMultiCompanyToggle}>
                     <Filter className="h-4 w-4 mr-2" />
-                    Cross-Company Only
+                    More-Than-One-Company
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>

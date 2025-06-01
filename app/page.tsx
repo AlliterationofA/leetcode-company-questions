@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChartContainer } from "@/components/ui/chart"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts"
 
 // Custom components
 import { ErrorBoundary } from "@/components/ui/error-boundary"
@@ -685,6 +685,8 @@ export default function LeetCodeAnalytics() {
                             outerRadius={100}
                             paddingAngle={5}
                             dataKey="value"
+                            label={({ name, value }) => `${name}: ${value}`}
+                            labelLine={false}
                           >
                             {data.stats.difficultyDistribution.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={entry.color} />
