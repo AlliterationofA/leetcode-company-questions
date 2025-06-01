@@ -66,49 +66,34 @@ export async function POST(request: Request) {
     let csvContent: string
 
     if (useLocalFile) {
-      // Use the local codedata.csv file in the repo instead of fetching from GitHub
-      // console.log("Fetching CSV data from GitHub repository...")
-      // try {
-      //   const response = await fetch(
-      //     "https://raw.githubusercontent.com/AlliterationofA/LeetcodeAnalyticsBackend/main/codedata.csv",
-      //   )
-      //   if (!response.ok) {
-      //     throw new Error(`Failed to fetch CSV data: ${response.status}`)
-      //   }
-      //   csvContent = await response.text()
-      //   console.log("CSV data fetched successfully from GitHub")
-      // } catch (error) {
-      //   console.error("Failed to fetch CSV data from GitHub:", error)
-      //   // Fallback to local file if GitHub fetch fails
-      //   const localFilePath = path.join(process.cwd(), "public", "data", "codedata.csv")
-      //   try {
-      //     csvContent = await fs.readFile(localFilePath, "utf-8")
-      //     console.log("Fallback: Local CSV file loaded successfully")
-      //   } catch (localError) {
-      //     console.error("Failed to read local CSV file:", localError)
-      //     return NextResponse.json(
-      //       {
-      //         success: false,
-      //         error: "Failed to fetch CSV data from GitHub and local file not found",
-      //       },
-      //       { status: 500 },
-      //     )
-      //   }
-      // }
-      // Use codedata.csv from the repo root
-      const localFilePath = path.join(process.cwd(), "codedata.csv")
+      // Use the GitHub raw URL for the CSV file
+      console.log("Fetching CSV data from GitHub repository...")
       try {
-        csvContent = await fs.readFile(localFilePath, "utf-8")
-        console.log("Local codedata.csv file loaded successfully from repo root")
-      } catch (localError) {
-        console.error("Failed to read local codedata.csv file:", localError)
-        return NextResponse.json(
-          {
-            success: false,
-            error: "Failed to read local codedata.csv file from repo root",
-          },
-          { status: 500 },
+        const response = await fetch(
+          "https://raw.githubusercontent.com/AlliterationofA/LeetcodeAnalyticsBackend/main/codedata.csv",
         )
+        if (!response.ok) {
+          throw new Error(`Failed to fetch CSV data: ${response.status}`)
+        }
+        csvContent = await response.text()
+        console.log("CSV data fetched successfully from GitHub")
+      } catch (error) {
+        console.error("Failed to fetch CSV data from GitHub:", error)
+        // Fallback to local file if GitHub fetch fails
+        const localFilePath = path.join(process.cwd(), "public", "data", "codedata.csv")
+        try {
+          csvContent = await fs.readFile(localFilePath, "utf-8")
+          console.log("Fallback: Local CSV file loaded successfully")
+        } catch (localError) {
+          console.error("Failed to read local CSV file:", localError)
+          return NextResponse.json(
+            {
+              success: false,
+              error: "Failed to fetch CSV data from GitHub and local file not found",
+            },
+            { status: 500 },
+          )
+        }
       }
     } else if (file) {
       // Use uploaded CSV file
