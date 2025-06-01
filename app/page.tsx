@@ -50,13 +50,37 @@ export default function LeetCodeAnalytics() {
 
   // Filters and sorting
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCompany, setSelectedCompany] = useState("all")
-  const [selectedDifficulty, setSelectedDifficulty] = useState("all")
-  const [selectedTimeframe, setSelectedTimeframe] = useState("all")
-  const [selectedTopic, setSelectedTopic] = useState("all")
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([])
+  const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>([])
+  const [selectedTimeframes, setSelectedTimeframes] = useState<string[]>([])
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([])
   const [sortField, setSortField] = useState<SortField>("title")
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
   const [showMultiCompany, setShowMultiCompany] = useState(false)
+  const [companyFilterMode, setCompanyFilterMode] = useState<"and" | "or">("or")
+  const [topicFilterMode, setTopicFilterMode] = useState<"and" | "or">("or")
+
+  // Calculate min/max for range filters
+  const occurrencesStats = useMemo(() => {
+    if (!data) return { min: 1, max: 278 }
+    const values = data.questions.map(q => q.originalRows?.length || 0)
+    return { min: Math.min(...values), max: Math.max(...values) }
+  }, [data])
+  const frequencyStats = useMemo(() => {
+    if (!data) return { min: 5, max: 100 }
+    const values = data.questions.map(q => q.frequency || 0)
+    return { min: Math.min(...values), max: Math.max(...values) }
+  }, [data])
+  const acceptanceStats = useMemo(() => {
+    if (!data) return { min: 0, max: 100 }
+    const values = data.questions.map(q => q.acceptance_rate || 0)
+    return { min: Math.min(...values), max: Math.max(...values) }
+  }, [data])
+
+  // Filters and sorting
+  const [occurrencesRange, setOccurrencesRange] = useState<{ min: number | ""; max: number | "" }>({ min: "", max: "" })
+  const [frequencyRange, setFrequencyRange] = useState<{ min: number | ""; max: number | "" }>({ min: "", max: "" })
+  const [acceptanceRange, setAcceptanceRange] = useState<{ min: number | ""; max: number | "" }>({ min: "", max: "" })
 
   // Clear success message after 5 seconds
   useEffect(() => {
@@ -179,15 +203,28 @@ export default function LeetCodeAnalytics() {
       totalQuestions: data.questions.length,
       filters: {
         searchTerm,
-        selectedCompany,
-        selectedDifficulty,
-        selectedTimeframe,
-        selectedTopic,
+        selectedCompanies,
+        selectedDifficulties,
+        selectedTimeframes,
+        selectedTopics,
         showMultiCompany,
+        companyFilterMode,
+        topicFilterMode,
+        occurrencesRange,
+        frequencyRange,
+        acceptanceRange,
       },
     })
 
-    // Filter questions based on their original CSV rows
+    // Get effective min/max for each range
+    const occMin = occurrencesRange.min === "" ? occurrencesStats.min : occurrencesRange.min
+    const occMax = occurrencesRange.max === "" ? occurrencesStats.max : occurrencesRange.max
+    const freqMin = frequencyRange.min === "" ? frequencyStats.min : frequencyRange.min
+    const freqMax = frequencyRange.max === "" ? frequencyStats.max : frequencyRange.max
+    const accMin = acceptanceRange.min === "" ? acceptanceStats.min : acceptanceRange.min
+    const accMax = acceptanceRange.max === "" ? acceptanceStats.max : acceptanceRange.max
+
+    // Filter questions based on their original CSV rows to maintain data integrity
     const filtered = data.questions.filter((question) => {
       // Check if any of the original rows match the filters
       const hasMatchingRow = question.originalRows?.some((row) => {
@@ -200,28 +237,54 @@ export default function LeetCodeAnalytics() {
         }
 
         // Company filter
-        if (selectedCompany !== "all" && row.company !== selectedCompany) {
-          return false
+        if (selectedCompanies.length > 0) {
+          if (companyFilterMode === "and") {
+            // AND operation: question must appear in ALL selected companies
+            const questionCompanies = new Set(question.companies)
+            if (!selectedCompanies.every(company => questionCompanies.has(company))) {
+              return false
+            }
+          } else {
+            // OR operation: question must appear in ANY selected company
+            if (!selectedCompanies.includes(row.company)) {
+              return false
+            }
+          }
         }
 
         // Difficulty filter
-        if (selectedDifficulty !== "all" && row.difficulty !== selectedDifficulty) {
+        if (selectedDifficulties.length > 0 && !selectedDifficulties.includes(row.difficulty)) {
           return false
         }
 
         // Timeframe filter
-        if (selectedTimeframe !== "all" && row.timeframe !== selectedTimeframe) {
+        if (selectedTimeframes.length > 0 && !selectedTimeframes.includes(row.timeframe)) {
           return false
         }
 
         // Topic filter
-        if (selectedTopic !== "all") {
+        if (selectedTopics.length > 0) {
           const topics = row.topics?.split(/[,;|]/).map((t) => t.trim()) || []
-          if (!topics.includes(selectedTopic)) {
-            return false
+          if (topicFilterMode === "and") {
+            // AND operation: question must have ALL selected topics
+            if (!selectedTopics.every(topic => topics.includes(topic))) {
+              return false
+            }
+          } else {
+            // OR operation: question must have ANY selected topic
+            if (!selectedTopics.some(topic => topics.includes(topic))) {
+              return false
+            }
           }
         }
 
+        // Occurrences filter
+        const occurrences = question.originalRows?.length || 0
+        if (occurrences < occMin || occurrences > occMax) return false
+        // Frequency filter
+        if (question.frequency < freqMin || question.frequency > freqMax) return false
+        // Acceptance filter
+        if (question.acceptance_rate < accMin || question.acceptance_rate > accMax) return false
         return true
       })
 
@@ -281,13 +344,21 @@ export default function LeetCodeAnalytics() {
   }, [
     data,
     searchTerm,
-    selectedCompany,
-    selectedDifficulty,
-    selectedTimeframe,
-    selectedTopic,
+    selectedCompanies,
+    selectedDifficulties,
+    selectedTimeframes,
+    selectedTopics,
     sortField,
     sortDirection,
     showMultiCompany,
+    companyFilterMode,
+    topicFilterMode,
+    occurrencesRange,
+    frequencyRange,
+    acceptanceRange,
+    occurrencesStats,
+    frequencyStats,
+    acceptanceStats,
   ])
 
   if (loading) {
@@ -453,22 +524,35 @@ export default function LeetCodeAnalytics() {
             <TabsContent value="problems" className="space-y-6">
               {/* Filters */}
               <FiltersPanel
-                selectedCompany={selectedCompany}
-                selectedDifficulty={selectedDifficulty}
-                selectedTimeframe={selectedTimeframe}
-                selectedTopic={selectedTopic}
+                selectedCompanies={selectedCompanies}
+                selectedDifficulties={selectedDifficulties}
+                selectedTimeframes={selectedTimeframes}
+                selectedTopics={selectedTopics}
                 showMultiCompany={showMultiCompany}
                 availableCompanies={availableCompanies}
                 availableDifficulties={availableDifficulties}
                 availableTimeframes={availableTimeframes}
                 availableTopics={availableTopics}
-                onCompanyChange={setSelectedCompany}
-                onDifficultyChange={setSelectedDifficulty}
-                onTimeframeChange={setSelectedTimeframe}
-                onTopicChange={setSelectedTopic}
+                onCompaniesChange={setSelectedCompanies}
+                onDifficultiesChange={setSelectedDifficulties}
+                onTimeframesChange={setSelectedTimeframes}
+                onTopicsChange={setSelectedTopics}
                 onMultiCompanyToggle={() => setShowMultiCompany(!showMultiCompany)}
                 filteredCount={filteredAndSortedQuestions.length}
                 totalCount={data.questions.length}
+                companyFilterMode={companyFilterMode}
+                onCompanyFilterModeChange={setCompanyFilterMode}
+                topicFilterMode={topicFilterMode}
+                onTopicFilterModeChange={setTopicFilterMode}
+                occurrencesRange={occurrencesRange}
+                onOccurrencesRangeChange={setOccurrencesRange}
+                frequencyRange={frequencyRange}
+                onFrequencyRangeChange={setFrequencyRange}
+                acceptanceRange={acceptanceRange}
+                onAcceptanceRangeChange={setAcceptanceRange}
+                occurrencesStats={occurrencesStats}
+                frequencyStats={frequencyStats}
+                acceptanceStats={acceptanceStats}
               />
 
               {/* Problems Table */}
