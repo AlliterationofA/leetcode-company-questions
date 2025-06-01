@@ -460,8 +460,15 @@ export default function LeetCodeAnalytics() {
           )}
 
           {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-            <Card className="hover:shadow-md transition-shadow">
+          <div className="flex flex-row flex-nowrap gap-6 mb-8 overflow-x-auto px-4"> {/* Scrolling container with padding */}
+            {/* Moved and styled 'Last Updated' section (unique size) */}
+            <DataInfoCard
+              metadata={data.metadata}
+              className="flex-shrink-0 w-96 cursor-pointer"
+            />
+
+            {/* Cards with uniform width */}
+            <Card className="flex-shrink-0 w-48 shadow-none hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Problems</CardTitle>
                 <Target className="h-4 w-4 text-muted-foreground" />
@@ -472,7 +479,7 @@ export default function LeetCodeAnalytics() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow">
+            <Card className="flex-shrink-0 w-48 shadow-none hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Companies</CardTitle>
                 <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -483,7 +490,7 @@ export default function LeetCodeAnalytics() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow">
+            <Card className="flex-shrink-0 w-48 shadow-none hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Avg Frequency</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -498,7 +505,7 @@ export default function LeetCodeAnalytics() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow">
+            <Card className="flex-shrink-0 w-48 shadow-none hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Avg Acceptance</CardTitle>
                 <Code className="h-4 w-4 text-muted-foreground" />
@@ -514,15 +521,14 @@ export default function LeetCodeAnalytics() {
               </CardContent>
             </Card>
 
-            {/* Data Info Card */}
-            <DataInfoCard metadata={data.metadata} />
-
-            {/* LeetCode Repo Data Info Card */}
+            {/* Data Source Last Updated Card (uniform width)*/}
             {leetcodeRepoLastUpdated && (
-              <Card className="hover:shadow-md transition-shadow">
+              <Card className="flex-shrink-0 w-64 shadow-none"> {/* This card should also be w-64 */}
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Data Source Last Updated</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium flex-grow mr-2">Data Source Last Updated</CardTitle>
+                  <div className="flex-shrink-0">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -532,7 +538,7 @@ export default function LeetCodeAnalytics() {
                       year: "numeric",
                     })}
                   </div>
-                  {/* <p className="text-xs text-muted-foreground">From liquidslr/leetcode-company-wise-problems</p> */}
+                  <p className="text-xs text-muted-foreground">From liquidslr/leetcode-company-wise-problems</p>
                 </CardContent>
               </Card>
             )}
