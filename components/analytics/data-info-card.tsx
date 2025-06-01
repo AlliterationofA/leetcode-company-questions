@@ -38,7 +38,13 @@ export function DataInfoCard({ metadata }: DataInfoCardProps) {
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{lastUpdated}</div>
-        <p className="text-xs text-muted-foreground">Data from GitHub repository</p>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+          Maintained by
+          <img src="https://github.com/AlliterationofA.png" alt="AlliterationofA GitHub Profile Picture" className="w-5 h-5 rounded-full" />
+          <a href="https://github.com/AlliterationofA" target="_blank" rel="noopener noreferrer" className="hover:underline">
+            @AlliterationofA
+          </a>
+        </div>
       </CardContent>
     </Card>
   )
