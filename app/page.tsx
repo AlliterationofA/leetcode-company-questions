@@ -464,7 +464,7 @@ export default function LeetCodeAnalytics() {
             {/* Moved and styled 'Last Updated' section (unique size) */}
             <DataInfoCard
               metadata={data.metadata}
-              className="flex-shrink-0 w-96 cursor-pointer"
+              className="flex-shrink-0 w-80 cursor-pointer"
             />
 
             {/* Cards with uniform width */}
