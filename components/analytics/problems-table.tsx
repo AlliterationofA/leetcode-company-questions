@@ -146,15 +146,35 @@ export function ProblemsTable({
               {displayedQuestions.map((question, index) => (
                 <TableRow key={`${question.title}-${index}`} className="hover:bg-muted/50">
                   <TableCell className="max-w-xs">
-                    <a
-                      href={question.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
-                    >
-                      <span className="truncate">{question.title}</span>
-                      <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={question.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                      >
+                        <span className="truncate">{question.title}</span>
+                        <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                      </a>
+                      {/* Editorial Link */}
+                      <a
+                        href={`${question.link}/editorial/`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        <FileText className="h-3 w-3" />
+                      </a>
+                      {/* Solution Link */}
+                      <a
+                        href={`${question.link}/solutions/`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        <CheckCircle className="h-3 w-3" />
+                      </a>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge className={getDifficultyColor(question.difficulty)}>{question.difficulty}</Badge>
