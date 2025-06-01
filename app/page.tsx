@@ -37,6 +37,7 @@ import { logger } from "@/lib/logger"
 import { apiClient } from "@/lib/api-client"
 import { csvProcessor, type AnalyticsData } from "@/lib/csv-processor"
 import { AppError } from "@/lib/error-handler"
+import { githubApi } from "@/lib/github-api"
 
 type SortField = "title" | "difficulty" | "frequency" | "acceptance_rate" | "timeframe" | "occurrences"
 type SortDirection = "asc" | "desc"
@@ -47,6 +48,8 @@ export default function LeetCodeAnalytics() {
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+
+  const [leetcodeRepoLastUpdated, setLeetcodeRepoLastUpdated] = useState<string | null>(null)
 
   // Filters and sorting
   const [searchTerm, setSearchTerm] = useState("")
@@ -118,6 +121,13 @@ export default function LeetCodeAnalytics() {
         companiesCount: analyticsData.companies.length,
         lastUpdated: analyticsData.metadata.lastUpdated,
       })
+
+      // Fetch last commit for the leetcode-company-wise-problems repo
+      const leetcodeRepoInfo = await githubApi.getLastCommitInfo(
+        "liquidslr",
+        "leetcode-company-wise-problems"
+      )
+      setLeetcodeRepoLastUpdated(leetcodeRepoInfo.lastUpdated)
     } catch (error) {
       const errorMessage = error instanceof AppError ? error.message : "Failed to process CSV data"
       logger.error("CSV processing failed", error instanceof Error ? error : new Error(String(error)))
@@ -415,7 +425,7 @@ export default function LeetCodeAnalytics() {
                     placeholder="Search problems or topics..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 w-64"
+                    className="pl-10 w-[500px]"
                   />
                 </div>
                 <Button variant="outline" size="sm" onClick={() => handleCSVProcessing(true)} disabled={processing}>
@@ -442,7 +452,7 @@ export default function LeetCodeAnalytics() {
           )}
 
           {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
             <Card className="hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Problems</CardTitle>
@@ -498,6 +508,26 @@ export default function LeetCodeAnalytics() {
 
             {/* Data Info Card */}
             <DataInfoCard metadata={data.metadata} />
+
+            {/* LeetCode Repo Data Info Card */}
+            {leetcodeRepoLastUpdated && (
+              <Card className="hover:shadow-md transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Data Source Last Updated</CardTitle>
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {new Date(leetcodeRepoLastUpdated).toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </div>
+                  {/* <p className="text-xs text-muted-foreground">From liquidslr/leetcode-company-wise-problems</p> */}
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Main Content */}

@@ -18,19 +18,33 @@ interface GitHubApiResponse {
   lastCommit: GitHubCommit
   lastUpdated: string
   commitUrl: string
+  commitAuthor?: string
+}
+
+interface GitHubRepositoryInfo {
+  name: string;
+  description: string;
+  updated_at: string;
+  html_url: string;
+  stargazers_count: number;
+  forks_count: number;
 }
 
 class GitHubApiClient {
   private readonly baseUrl = "https://api.github.com"
-  private readonly owner = "AlliterationofA"
-  private readonly repo = "PublicFiles"
-  private readonly filePath = "codedata.csv"
 
-  async getLastCommitInfo(): Promise<GitHubApiResponse> {
+  async getLastCommitInfo(
+    owner: string = "AlliterationofA",
+    repo: string = "PublicFiles",
+    filePath?: string,
+  ): Promise<GitHubApiResponse> {
     try {
-      logger.info("Fetching last commit info from GitHub API")
+      let url = `${this.baseUrl}/repos/${owner}/${repo}/commits?per_page=1`;
+      if (filePath) {
+        url = `${this.baseUrl}/repos/${owner}/${repo}/commits?path=${filePath}&per_page=1`;
+      }
 
-      const url = `${this.baseUrl}/repos/${this.owner}/${this.repo}/commits?path=${this.filePath}&per_page=1`
+      logger.info(`Fetching last commit info for ${owner}/${repo}${filePath ? '/' + filePath : ''} from GitHub API`);
 
       const response = await fetch(url, {
         headers: {
@@ -54,10 +68,10 @@ class GitHubApiClient {
                 },
                 message: "Unable to fetch commit info (rate limited)",
               },
-              html_url: `https://github.com/${this.owner}/${this.repo}/commits`,
+              html_url: `https://github.com/${owner}/${repo}/commits`,
             },
             lastUpdated: new Date().toISOString(),
-            commitUrl: `https://github.com/${this.owner}/${this.repo}/commits`,
+            commitUrl: `https://github.com/${owner}/${repo}/commits`,
           }
         }
         throw new NetworkError(`GitHub API error: ${response.status} ${response.statusText}`)
@@ -98,21 +112,24 @@ class GitHubApiClient {
             },
             message: "Unable to fetch commit info",
           },
-          html_url: `https://github.com/${this.owner}/${this.repo}/commits`,
+          html_url: `https://github.com/${owner}/${repo}/commits`,
         },
         lastUpdated: new Date().toISOString(),
-        commitUrl: `https://github.com/${this.owner}/${this.repo}/commits`,
+        commitUrl: `https://github.com/${owner}/${repo}/commits`,
       }
     }
   }
 
-  async getRepositoryInfo() {
+  async getRepositoryInfo(
+    owner: string = "AlliterationofA",
+    repo: string = "PublicFiles",
+  ): Promise<GitHubRepositoryInfo> {
     try {
-      logger.info("Fetching repository info from GitHub API")
+      logger.info(`Fetching repository info for ${owner}/${repo} from GitHub API`);
 
-      const url = `${this.baseUrl}/repos/${this.owner}/${this.repo}`
+      const url: string = `${this.baseUrl}/repos/${owner}/${repo}`;
 
-      const response = await fetch(url, {
+      const response: Response = await fetch(url, {
         headers: {
           Accept: "application/vnd.github.v3+json",
           "User-Agent": "LeetCode-Analytics-App",
@@ -123,21 +140,21 @@ class GitHubApiClient {
         throw new NetworkError(`GitHub API error: ${response.status} ${response.statusText}`)
       }
 
-      const repo = await response.json()
+      const repoData: GitHubRepositoryInfo = await response.json()
 
       logger.info("Successfully fetched repository info", {
-        name: repo.name,
-        updatedAt: repo.updated_at,
-        stars: repo.stargazers_count,
+        name: repoData.name,
+        updated_at: repoData.updated_at,
+        stars: repoData.stargazers_count,
       })
 
       return {
-        name: repo.name,
-        description: repo.description,
-        updatedAt: repo.updated_at,
-        htmlUrl: repo.html_url,
-        stars: repo.stargazers_count,
-        forks: repo.forks_count,
+        name: repoData.name,
+        description: repoData.description,
+        updated_at: repoData.updated_at,
+        html_url: repoData.html_url,
+        stargazers_count: repoData.stargazers_count,
+        forks_count: repoData.forks_count,
       }
     } catch (error) {
       const appError = handleError(error, "GitHub Repository API")
