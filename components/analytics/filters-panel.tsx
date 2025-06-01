@@ -145,7 +145,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0" align="start">
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
                   <Command>
                     <CommandInput
                       placeholder="Search companies..."
@@ -256,54 +256,59 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0" align="start">
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
                   <Command>
                     <CommandGroup>
                       <div className="flex flex-wrap gap-2 p-2">
-                        {availableDifficulties.map((difficulty) => {
-                          const isSelected = selectedDifficulties.includes(difficulty)
-                          const diff = difficulty.toUpperCase()
-                          const colorClass =
-                            diff === "EASY"
-                              ? isSelected
-                                ? "bg-green-600 text-white border-green-700"
-                                : "border border-green-200 text-green-600 bg-white hover:bg-green-50"
-                              : diff === "MEDIUM"
-                              ? isSelected
-                                ? "bg-yellow-500 text-white border-yellow-600"
-                                : "border border-yellow-200 text-yellow-600 bg-white hover:bg-yellow-50"
-                              : diff === "HARD"
-                              ? isSelected
-                                ? "bg-red-600 text-white border-red-700"
-                                : "border border-red-200 text-red-600 bg-white hover:bg-red-50"
-                              : ""
-                          return (
-                            <Button
-                              key={difficulty}
-                              variant="ghost"
-                              size="sm"
-                              className={cn(
-                                "h-8 px-4 font-bold rounded-full transition-colors text-xs border",
-                                colorClass
-                              )}
-                              style={{ boxShadow: "none" }}
-                              onClick={() => {
-                                if (isSelected) {
-                                  onDifficultiesChange(selectedDifficulties.filter(d => d !== difficulty))
-                                } else {
-                                  onDifficultiesChange([...selectedDifficulties, difficulty])
-                                }
-                              }}
-                            >
-                              {difficulty}
-                              {isSelected && (
-                                <span className="ml-2 flex items-center">
-                                  <X className="h-3 w-3" />
-                                </span>
-                              )}
-                            </Button>
-                          )
-                        })}
+                        {availableDifficulties
+                          .sort((a, b) => {
+                            const order = { easy: 1, medium: 2, hard: 3 };
+                            return order[a.toLowerCase() as keyof typeof order] - order[b.toLowerCase() as keyof typeof order];
+                          })
+                          .map((difficulty) => {
+                            const isSelected = selectedDifficulties.includes(difficulty)
+                            const diff = difficulty.toUpperCase()
+                            const colorClass =
+                              diff === "EASY"
+                                ? isSelected
+                                  ? "bg-green-600 text-white border-green-700"
+                                  : "border border-green-200 text-green-600 bg-white hover:bg-green-50"
+                                : diff === "MEDIUM"
+                                ? isSelected
+                                  ? "bg-yellow-500 text-white border-yellow-600"
+                                  : "border border-yellow-200 text-yellow-600 bg-white hover:bg-yellow-50"
+                                : diff === "HARD"
+                                ? isSelected
+                                  ? "bg-red-600 text-white border-red-700"
+                                  : "border border-red-200 text-red-600 bg-white hover:bg-red-50"
+                                : ""
+                            return (
+                              <Button
+                                key={difficulty}
+                                variant="ghost"
+                                size="sm"
+                                className={cn(
+                                  "h-8 px-4 font-bold rounded-full transition-colors text-xs border",
+                                  colorClass
+                                )}
+                                style={{ boxShadow: "none" }}
+                                onClick={() => {
+                                  if (isSelected) {
+                                    onDifficultiesChange(selectedDifficulties.filter(d => d !== difficulty))
+                                  } else {
+                                    onDifficultiesChange([...selectedDifficulties, difficulty])
+                                  }
+                                }}
+                              >
+                                {difficulty}
+                                {isSelected && (
+                                  <span className="ml-2 flex items-center">
+                                    <X className="h-3 w-3" />
+                                  </span>
+                                )}
+                              </Button>
+                            )
+                          })}
                       </div>
                     </CommandGroup>
                   </Command>
@@ -331,7 +336,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0" align="start">
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
                   <Command>
                     <CommandGroup className="max-h-[300px] overflow-auto p-2">
                       <div className="flex flex-wrap gap-2">
@@ -398,7 +403,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0" align="start">
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
                   <Command>
                     <CommandInput
                       placeholder="Search topics..."
