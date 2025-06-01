@@ -105,7 +105,7 @@ The `app/api/process-csv/route.ts` file directly solves our central use case by 
 5.  **Processing Logic:** The `POST` function's code runs on the server:
     *   It checks if a file was uploaded or if the request asks to use the default GitHub file.
     *   It reads the content of the chosen CSV file (either from the uploaded file or by fetching it from GitHub, and using a local fallback if GitHub fails).
-    *   It performs the complex data parsing, cleaning, and structuring logic ([Chapter 5: CSV Data Processing](05_csv_data_processing_.md)) to transform the raw CSV text into the `AnalyticsData` structure ([Chapter 2: Analytics Data Structure](02_analytics_data_structure_.md)).
+    *   It performs the complex data parsing, cleaning, and structuring logic ([Chapter 5: CSV Data Processing](05_csv_data_processing.md)) to transform the raw CSV text into the `AnalyticsData` structure ([Chapter 2: Analytics Data Structure](02_analytics_data_structure_.md)).
 6.  **Response Sent:** Once the `AnalyticsData` object is ready (or if an error occurred), the `POST` function returns a `NextResponse.json()` object containing either the `success: true` status and the `data: analyticsData`, or `success: false` and an `error` message.
 7.  **API Client Receives Response:** The API Client on the frontend receives this response.
 8.  **Frontend Updates:** The API Client returns the processed data (or throws an error) back to `app/page.tsx`, which updates its state (`setData`, `setError`) to display the results to the user.
@@ -116,33 +116,7 @@ This sequence shows how the API Route Handler acts as the crucial middle layer, 
 
 Let's trace the journey of a `POST` request from the frontend (via API Client) to the server and back.
 
-```mermaid
-sequenceDiagram
-    participant Frontend as app/page.tsx (calls API Client)
-    participant ApiClient as lib/api-client.ts (makes fetch call)
-    participant BrowserFetch as Browser Fetch API
-    participant NextjsServer as Next.js Server
-    participant ApiRoute as app/api/process-csv/route.ts (POST handler)
-    participant CSVProcessor as Data Processing Logic
-    participant DataSource as GitHub URL / Local File
-
-    Frontend->>ApiClient: Call processCSV() or fetchDefaultCSV()
-    ApiClient->>BrowserFetch: Use fetch() POST /api/process-csv
-    BrowserFetch->>NextjsServer: Send HTTP POST request to /api/process-csv
-    NextjsServer->>ApiRoute: Route request to POST function in route.ts
-    ApiRoute->>ApiRoute: Read request body (file/flags)
-    ApiRoute->>DataSource: Fetch/Read CSV content (GitHub or Local)
-    DataSource-->>ApiRoute: Return raw CSV text
-    ApiRoute->>CSVProcessor: Pass raw CSV text for processing
-    CSVProcessor-->>ApiRoute: Return structured AnalyticsData
-    ApiRoute->>ApiRoute: Create NextResponse.json({...})
-    ApiRoute-->>NextjsServer: Return NextResponse
-    NextjsServer-->>BrowserFetch: Send HTTP Response (JSON data)
-    BrowserFetch-->>ApiClient: Return fetch Response object
-    Note over ApiClient: Process response, extract JSON
-    ApiClient-->>Frontend: Return structured AnalyticsData (or throw error)
-    Note over Frontend: Update state, display results
-```
+![API Route Handlers Sequence Diagram](/public/diagrams/chapter4.svg)
 
 Now, let's look at simplified code snippets from `app/api/process-csv/route.ts` to see parts of this flow in action.
 
@@ -268,7 +242,7 @@ In this chapter, we've learned about **API Route Handlers (`app/api/...`)**. We 
 
 Now that we know *how* the raw data gets to the server-side API route, the next logical step is to understand *what happens* to that data inside the handler – the complex steps of parsing, cleaning, and structuring the raw CSV text.
 
-[Chapter 5: CSV Data Processing](05_csv_data_processing_.md)
+[Chapter 5: CSV Data Processing](05_csv_data_processing.md)
 
 ---
 

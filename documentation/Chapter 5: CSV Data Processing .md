@@ -179,31 +179,7 @@ This modular design keeps the complex processing logic separate from the API rou
 
 Let's visualize the steps the `CSVProcessor` takes when its `processCSVContent` method is called.
 
-```mermaid
-sequenceDiagram
-    participant RawCSVText as Raw CSV Text
-    participant CSVProcessor as CSVProcessor (lib/csv-processor.ts)
-    participant ParsedRows as List of Parsed Rows
-    participant GroupedQuestions as Map of Unique Questions
-    participant QuestionsList as List of Question Objects
-    participant CompanyData as List of CompanyData
-    participant OverallStats as Overall Stats Object
-    participant FinalAnalyticsData as AnalyticsData Object
-
-    RawCSVText->>CSVProcessor: processCSVContent(rawText)
-    CSVProcessor->>ParsedRows: Parse raw text line by line, clean data
-    ParsedRows->>CSVProcessor: Return list of cleaned rows
-    CSVProcessor->>GroupedQuestions: Group rows by title (using Map)
-    GroupedQuestions->>CSVProcessor: Return map of unique questions
-    CSVProcessor->>QuestionsList: Convert map to final Question objects array
-    QuestionsList->>CSVProcessor: Calculate company stats based on questions
-    CSVProcessor->>CompanyData: Return CompanyData list
-    QuestionsList->>CSVProcessor: Calculate overall stats based on questions
-    CSVProcessor->>OverallStats: Return Overall Stats object
-    CSVProcessor->>FinalAnalyticsData: Bundle Questions, CompanyData, OverallStats, Metadata
-    FinalAnalyticsData-->>APIHandler as app/api/...route.ts: Return AnalyticsData
-    Note over APIHandler: API Handler sends this data to frontend
-```
+![CSV Data Processing Sequence Diagram](assets/chapter5.svg)
 
 This diagram shows the transformation pipeline. The raw text is progressively processed, grouped, and summarized through several internal steps within the `CSVProcessor` until the final structured `AnalyticsData` object is assembled.
 
@@ -324,7 +300,7 @@ In this chapter, we explored the vital concept of **CSV Data Processing**. We le
 
 Now that we have the structured `AnalyticsData` object, the next step is to make it interactive. How do users search through this data or show only problems from a specific company? That's what we'll cover in the next chapter: Filtering and Sorting.
 
-[Chapter 6: Filtering and Sorting](06_filtering_and_sorting_.md)
+[Chapter 6: Filtering and Sorting](06_filtering_and_sorting.md)
 
 ---
 

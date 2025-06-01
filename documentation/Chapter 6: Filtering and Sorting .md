@@ -1,6 +1,6 @@
 # Chapter 6: Filtering and Sorting
 
-Welcome back! In the previous chapter ([Chapter 5: CSV Data Processing](05_csv_data_processing_.md)), we learned how the raw CSV data is processed and transformed into a clean, structured format called `AnalyticsData`. This data includes a list of unique programming problems, company stats, and overall metrics, ready to be displayed.
+Welcome back! In the previous chapter ([Chapter 5: CSV Data Processing](05_csv_data_processing.md)), we learned how the raw CSV data is processed and transformed into a clean, structured format called `AnalyticsData`. This data includes a list of unique programming problems, company stats, and overall metrics, ready to be displayed.
 
 Now that we have this organized data, simply showing a huge list of problems might be overwhelming. Imagine there are hundreds or thousands of problems – finding a specific one would be difficult! We need a way for users to easily narrow down the list and arrange it how they like.
 
@@ -288,36 +288,7 @@ This cycle repeats every time a user changes a filter, types in the search box, 
 
 Let's trace the simplified process when a user changes a filter or sorts:
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant FiltersPanel as Filters UI (Dropdowns, etc.)
-    participant ProblemsTable as Table UI (Headers)
-    participant AppPage as app/page.tsx (State & Logic)
-    participant ProcessedData as data.questions (Full List)
-
-    User->>FiltersPanel: Selects filter (e.g., Company: Google)
-    FiltersPanel->>AppPage: Call onCompanyChange("Google")
-    AppPage->>AppPage: Update state (setSelectedCompany)
-    Note over AppPage: State change triggers re-render
-    AppPage->>AppPage: Recalculate filtered/sorted list (useMemo)
-    AppPage->>ProcessedData: Access full list (data.questions)
-    Note over AppPage: Apply filter logic (e.g., check companies list)
-    Note over AppPage: Apply sort logic (e.g., compare titles)
-    AppPage-->>ProblemsTable: Pass new filtered & sorted list
-    ProblemsTable->>User: Display updated table
-
-    User->>ProblemsTable: Clicks column header (e.g., Difficulty)
-    ProblemsTable->>AppPage: Call onSort("difficulty")
-    AppPage->>AppPage: Update state (setSortField, setSortDirection)
-    Note over AppPage: State change triggers re-render
-    AppPage->>AppPage: Recalculate filtered/sorted list (useMemo)
-    AppPage->>ProcessedData: Access full list (data.questions)
-    Note over AppPage: Apply current filters (Company: Google, etc.)
-    Note over AppPage: Apply NEW sort logic (Difficulty asc/desc)
-    AppPage-->>ProblemsTable: Pass new filtered & sorted list
-    ProblemsTable->>User: Display updated table
-```
+![Filtering and Sorting Sequence Diagram](/public/diagrams/chapter6.svg)
 
 This diagram shows how user interaction with the UI components triggers state updates in `app/page.tsx`, which then performs the core filtering and sorting calculations using the full `data.questions` list and passes the result back down to the display component (`ProblemsTable`).
 
@@ -379,7 +350,7 @@ const filtered = data.questions.filter((question) => {
   return true; // Include this question in the filtered list
 });
 ```
-This filter logic iterates through each *unique* `question` object. For each question, it then iterates through the `originalRows` that were combined to create it ([Chapter 5: CSV Data Processing](05_csv_data_processing_.md)). It uses the `.some()` method to see if *at least one* of these original rows matches *all* of the currently selected filter criteria (search term, company, difficulty, timeframe, topic). Only if `hasMatchingRow` is true (and the `showMultiCompany` check passes) is the `question` kept in the `filtered` list.
+This filter logic iterates through each *unique* `question` object. For each question, it then iterates through the `originalRows` that were combined to create it ([Chapter 5: CSV Data Processing](05_csv_data_processing.md)). It uses the `.some()` method to see if *at least one* of these original rows matches *all* of the currently selected filter criteria (search term, company, difficulty, timeframe, topic). Only if `hasMatchingRow` is true (and the `showMultiCompany` check passes) is the `question` kept in the `filtered` list.
 
 Next, the sorting logic:
 
@@ -439,7 +410,7 @@ In this chapter, we've explored the critical concept of **Filtering and Sorting*
 
 Now that we've seen how the data is fetched, processed, structured, filtered, and sorted, let's look at the building blocks that make up the user interface itself – the components we've been referencing like `<FiltersPanel>` and `<ProblemsTable>`. These components are often built using a UI library.
 
-[Chapter 7: UI Component Library (shadcn/ui)](07_ui_component_library__shadcn_ui__.md)
+[Chapter 7: UI Component Library](07_ui_component_library.md)
 
 ---
 

@@ -1,6 +1,6 @@
 # Chapter 8: Error Handling (`lib/error-handler.ts`)
 
-Welcome back, data dashboard builder! In our journey so far, we've learned how to build the user interface with a component library ([Chapter 7: UI Component Library (shadcn/ui)](07_ui_component_library__shadcn_ui__.md)), fetch data using the API client ([Chapter 3: API Client (`lib/api-client.ts`)](03_api_client___lib_api_client_ts___.md)), process it on the server ([Chapter 4: API Route Handlers (`app/api/...`)](04_api_route_handlers___app_api_______.md) and [Chapter 5: CSV Data Processing](05_csv_data_processing_.md)), structure it ([Chapter 2: Analytics Data Structure](02_analytics_data_structure_.md)), and make it interactive with filtering and sorting ([Chapter 6: Filtering and Sorting](06_filtering_and_sorting_.md)).
+Welcome back, data dashboard builder! In our journey so far, we've learned how to build the user interface with a component library ([Chapter 7: UI Component Library](07_ui_component_library.md)), fetch data using the API client ([Chapter 3: API Client (`lib/api-client.ts`)](03_api_client___lib_api_client_ts___.md)), process it on the server ([Chapter 4: API Route Handlers (`app/api/...`)](04_api_route_handlers___app_api_______.md) and [Chapter 5: CSV Data Processing](05_csv_data_processing_.md)), structure it ([Chapter 2: Analytics Data Structure](02_analytics_data_structure_.md)), and make it interactive with filtering and sorting ([Chapter 6: Filtering and Sorting](06_filtering_and_sorting_.md)).
 
 But what happens when things don't go perfectly? The internet connection might drop while fetching data, the CSV file might be formatted incorrectly, or something unexpected could happen during processing. If our application doesn't handle these situations gracefully, the user might see a blank screen, a confusing error message, or the whole application might crash.
 
@@ -148,29 +148,7 @@ This chain ensures that even if a low-level network issue occurs, it gets wrappe
 
 Let's visualize the flow when an error happens during data fetching and how `lib/error-handler.ts` plays its part.
 
-```mermaid
-sequenceDiagram
-    participant AppPage as app/page.tsx (useEffect)
-    participant ApiClient as lib/api-client.ts
-    participant ErrorHandler as lib/error-handler.ts
-    participant Logger as lib/logger.ts
-    participant User
-
-    AppPage->>ApiClient: Call fetchGitHubCSV() (inside try)
-    ApiClient->>ApiClient: Perform fetch...
-    Note over ApiClient: Network error occurs (e.g., offline)
-    ApiClient-->>ApiClient: Throw built-in Error or NetworkError
-    ApiClient->>ApiClient: Catch (error) block entered
-    ApiClient->>ErrorHandler: Call handleError(error, "GitHub CSV Fetch")
-    ErrorHandler->>Logger: Log error details
-    ErrorHandler-->>ApiClient: Return standardized AppError
-    ApiClient-->>ApiClient: Re-throw AppError
-    ApiClient--xAppPage: Error propagates
-    AppPage->>AppPage: Catch (error) block entered
-    AppPage->>AppPage: Update state (setError(appError))
-    Note over AppPage: State update triggers re-render
-    AppPage->>User: Render UI with error message (e.g., using StatusIndicator)
-```
+![Error Handling Sequence Diagram](assets/chapter8.svg)
 
 This diagram shows how an error originating in `ApiClient` is caught, processed by `ErrorHandler`, logged, and then re-thrown so that the calling component (`AppPage`) can catch it and update its display state.
 

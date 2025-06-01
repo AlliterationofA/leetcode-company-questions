@@ -1,8 +1,8 @@
 # Chapter 3: API Client (`lib/api-client.ts`)
 
-Welcome back, aspiring developer! In our last chapter ([Chapter 2: Analytics Data Structure](02_analytics_data_structure_.md)), we explored the organized format of the data our application uses to display information. We learned *what* the data looks like once it's ready.
+Welcome back, aspiring developer! In our last chapter ([Chapter 2: Analytics Data Structure](02_analytics_data_structure.md)), we explored the organized format of the data our application uses to display information. We learned *what* the data looks like once it's ready.
 
-Now, the big question is: How does the main application page ([Chapter 1: Main Application Page (`app/page.tsx`)](01_main_application_page___app_page_tsx___.md)) actually *get* this data in the first place? It needs to reach out to somewhere – either a backend service or an external source – to retrieve the raw information.
+Now, the big question is: How does the main application page ([Chapter 1: Main Application Page (`app/page.tsx`)](01_main_application_page.md)) actually *get* this data in the first place? It needs to reach out to somewhere – either a backend service or an external source – to retrieve the raw information.
 
 That's where the **API Client** comes in!
 
@@ -113,7 +113,7 @@ The main way `app/page.tsx` (and potentially other parts of the frontend) intera
 
 The API Client directly solves the use case of fetching the raw CSV data by providing the `fetchGitHubCSV()` method.
 
-1.  The main page ([Chapter 1: Main Application Page (`app/page.tsx`)](01_main_application_page___app_page_tsx___.md)) needs the data.
+1.  The main page ([Chapter 1: Main Application Page (`app/page.tsx`)](01_main_application_page.md)) needs the data.
 2.  Instead of writing `fetch('https://...')` directly in `app/page.tsx`, it calls `apiClient.fetchGitHubCSV()`.
 3.  The `apiClient` knows the specific URL and details needed to fetch the file.
 4.  It performs the network request.
@@ -144,22 +144,7 @@ First, a simple walkthrough:
 
 Here's a sequence diagram showing this simple flow:
 
-```mermaid
-sequenceDiagram
-    participant AppPage as app/page.tsx
-    participant ApiClient as lib/api-client.ts
-    participant BrowserFetch as Browser Fetch API
-    participant GitHubURL as GitHub File URL
-
-    AppPage->>ApiClient: Call fetchGitHubCSV()
-    ApiClient->>BrowserFetch: Use fetch() with GitHub URL
-    BrowserFetch->>GitHubURL: Make GET request
-    GitHubURL-->>BrowserFetch: Send back File Content (CSV text)
-    BrowserFetch-->>ApiClient: Return Response object
-    Note over ApiClient: Check response status, read text
-    ApiClient-->>AppPage: Return CSV text string
-    Note over AppPage: Use the CSV text for processing
-```
+![API Client Sequence Diagram](/public/diagrams/chapter3.svg)
 
 Now, let's look at the actual (simplified) code inside `lib/api-client.ts`:
 
@@ -229,7 +214,7 @@ In this chapter, we introduced the **API Client** (`lib/api-client.ts`). We lear
 
 Now that we understand how the frontend *requests* data via the API Client, what about the other side? How does our application provide data via its *own* API endpoints? That's the topic of our next chapter!
 
-[Chapter 4: API Route Handlers (`app/api/...`)](04_api_route_handlers___app_api_______.md)
+[Chapter 4: API Route Handlers](04_api_route_handlers.md)
 
 ---
 

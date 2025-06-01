@@ -1,6 +1,6 @@
 # Chapter 2: Analytics Data Structure
 
-Welcome back! In the previous chapter ([Chapter 1: Main Application Page (`app/page.tsx`)](01_main_application_page___app_page_tsx___.md)), we saw how `app/page.tsx` acts as the conductor for our dashboard, fetching data, managing filters, and deciding what to show on screen. But what exactly *is* that data? How is it organized once it's fetched and processed?
+Welcome back! In the previous chapter ([Chapter 1: Main Application Page](01_main_application_page.md)), we saw how `app/page.tsx` acts as the conductor for our dashboard, fetching data, managing filters, and deciding what to show on screen. But what exactly *is* that data? How is it organized once it's fetched and processed?
 
 That's what this chapter is all about: the **Analytics Data Structure**.
 
@@ -188,7 +188,7 @@ Where does this `AnalyticsData` object come from? It's the final output of the d
 
 Essentially, the process looks like this:
 
-1.  Raw data (like CSV text) is obtained ([API Client (`lib/api-client.ts`)](03_api_client___lib_api_client_ts___.md)).
+1.  Raw data (like CSV text) is obtained ([API Client](03_api_client.md)).
 2.  A processing function (in `lib/csv-processor.ts`) takes the raw data.
 3.  It parses the raw data line by line.
 4.  It groups related data (like multiple rows for the same problem) to create the list of unique `Question` objects.
@@ -199,27 +199,93 @@ Essentially, the process looks like this:
 
 Here's a simplified look at this creation flow:
 
+<!-- Original mermaid diagram:
 ```mermaid
-sequenceDiagram
-    participant RawData as Raw CSV Text
-    participant CSVProcessor as lib/csv-processor.ts
-    participant QuestionList as questions: Question[]
-    participant CompanyList as companies: CompanyData[]
-    participant StatsObject as stats: {}
-    participant MetadataObject as metadata: {}
-    participant AnalyticsData as AnalyticsData Object
+classDiagram
+    class AnalyticsData {
+        +Question[] questions
+        +CompanyData[] companies
+        +OverallStats stats
+        +DataMetadata metadata
+    }
 
-    RawData->>CSVProcessor: Receives CSV content
-    Note over CSVProcessor: Parses rows, groups data, calculates stats
-    CSVProcessor->>QuestionList: Creates list of unique Questions
-    CSVProcessor->>CompanyList: Creates list of CompanyData
-    CSVProcessor->>StatsObject: Creates stats object
-    CSVProcessor->>MetadataObject: Creates metadata object
-    CSVProcessor->>AnalyticsData: Bundles all parts together
-    AnalyticsData-->>AppPage as app/page.tsx: Returns the structured data
+    class Question {
+        +string title
+        +string difficulty
+        +string link
+        +number frequency
+        +number acceptance_rate
+        +string[] companies
+        +string[] timeframes
+        +string topics
+        +CSVRow[] originalRows
+    }
+
+    class CompanyData {
+        +string name
+        +number totalProblems
+        +number thirtyDays
+        +number threeMonths
+        +number sixMonths
+        +number moreThanSixMonths
+        +number all
+    }
+
+    class OverallStats {
+        +number totalProblems
+        +number totalCompanies
+        +DifficultyDistribution[] difficultyDistribution
+        +TimeframeDistribution[] timeframeDistribution
+        +TopicStats[] topTopics
+    }
+
+    class DataMetadata {
+        +string lastUpdated
+        +string cloneDate
+        +string lastCommitHash
+        +string commitUrl
+        +string commitMessage
+        +string commitAuthor
+    }
+
+    AnalyticsData "1" -- "*" Question : contains
+    AnalyticsData "1" -- "*" CompanyData : contains
+    AnalyticsData "1" -- "1" OverallStats : contains
+    AnalyticsData "1" -- "1" DataMetadata : contains
+    Question "1" -- "*" CSVRow : derived from
+    OverallStats "1" -- "*" DifficultyDistribution : details
+    OverallStats "1" -- "*" TimeframeDistribution : details
+    OverallStats "1" -- "*" TopicStats : details
+
+    class DifficultyDistribution {
+        +string name
+        +number value
+        +string color
+    }
+    class TimeframeDistribution {
+        +string name
+        +number value
+    }
+    class TopicStats {
+        +string name
+        +number count
+    }
+    class CSVRow {
+        +string title
+        +string company
+        +string timeframe
+        +string difficulty
+        +string topics
+        +string url
+        +string acceptance
+        +string frequency
+    }
+
+
 ```
+-->
 
-The actual code that defines these structures lives primarily in files responsible for processing data or handling API responses, ensuring consistency. You can find these definitions, for example, in `lib/csv-processor.ts` and `app/api/process-csv/route.ts`. They look very similar because they need to agree on the format.
+<!-- Note: Corresponding SVG (chapter2.svg) was not found in assets directory. -->
 
 Here are small snippets showing where these types are defined (you don't need to understand every line yet!):
 
@@ -262,7 +328,7 @@ In this chapter, we've demystified the **Analytics Data Structure**. We learned 
 
 Now that we know *what* the data looks like when it's ready, let's explore *how* `app/page.tsx` gets this data in the first place. In the next chapter, we'll look at the API Client.
 
-[Chapter 3: API Client (`lib/api-client.ts`)](03_api_client___lib_api_client_ts___.md)
+[Chapter 3: API Client](03_api_client.md)
 
 ---
 

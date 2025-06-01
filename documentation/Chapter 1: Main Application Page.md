@@ -240,34 +240,25 @@ Let's see how `app/page.tsx` ties these concepts together to display and manage 
 
 ### Under the Hood: A Simplified Flow
 
-Let's visualize the core flow of loading data and reacting to a simple filter change.
-
+<!-- Original mermaid diagram:
 ```mermaid
 sequenceDiagram
     participant User
+    participant FiltersPanel as components/filters-panel.tsx
     participant AppPage as app/page.tsx
-    participant ApiClient as lib/api-client.ts
+    participant FilteredList as useMemo filtered list
+    participant Table as components/problems-table.tsx
 
-    User->>AppPage: Visits page
-    AppPage->>AppPage: Initialize state (loading=true)
-    AppPage->>AppPage: useEffect runs (on mount)
-    AppPage->>ApiClient: Fetch data (e.g., fetchGitHubCSV)
-    Note over ApiClient: Goes to API route or fetches directly
-    ApiClient-->>AppPage: Return raw data (e.g., CSV text)
-    Note over AppPage: Process raw data into structured data
-    AppPage->>AppPage: Update state (data=processedData, loading=false)
-    AppPage->>AppPage: Recalculate filtered/sorted list (useMemo)
-    AppPage->>User: Render UI (show table with data)
-
-    User->>AppPage: Changes a filter (e.g., selects a company)
-    AppPage->>AppPage: Update filter state (e.g., setSelectedCompany)
+    User->>FiltersPanel: Select company filter
+    FiltersPanel->>AppPage: Update filter state
     Note over AppPage: State change triggers re-render
-    AppPage->>AppPage: Recalculate filtered/sorted list (useMemo)
-    Note over AppPage: Filtering logic applies selected company
-    AppPage->>User: Update UI (show table with filtered data)
+    AppPage->>FilteredList: Recalculate filtered list
+    FilteredList-->>Table: Pass filtered data
+    Table->>User: Update table display
 ```
+-->
 
-This diagram shows the initial data loading sequence and then the quick cycle that happens whenever a user interacts with a filter or sort control. The `app/page.tsx` component acts as the central point, managing state and triggering updates to the visible data.
+<!-- Note: Corresponding SVG (chapter1.svg) was not found in assets directory. -->
 
 ### Conclusion
 
@@ -275,7 +266,7 @@ In this chapter, we explored `app/page.tsx`, the main component of our applicati
 
 The data that `app/page.tsx` fetches and works with has a specific structure. In the next chapter, we will dive into understanding this structure.
 
-[Chapter 2: Analytics Data Structure](02_analytics_data_structure_.md)
+[Chapter 2: Analytics Data Structure](02_analytics_data_structure.md)
 
 ---
 

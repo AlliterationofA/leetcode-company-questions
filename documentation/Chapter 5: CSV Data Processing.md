@@ -1,0 +1,1 @@
+![CSV Data Processing Sequence Diagram](/public/diagrams/chapter5.svg) 
