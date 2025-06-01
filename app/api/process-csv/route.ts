@@ -376,7 +376,7 @@ export async function GET(request: Request) {
     let csvContent: string
     try {
       const response = await fetch(
-        "https://raw.githubusercontent.com/AlliterationofA/LeetcodeAnalyticsBackend/main/leetcode_company_questions.csv",
+        "https://raw.githubusercontent.com/AlliterationofA/LeetcodeAnalyticsBackend/main/codedata.csv",
       )
       if (!response.ok) {
         throw new Error(`Failed to fetch CSV data: ${response.status}`)

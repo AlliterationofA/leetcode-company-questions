@@ -24,7 +24,7 @@ class GitHubApiClient {
   private readonly baseUrl = "https://api.github.com"
   private readonly owner = "AlliterationofA"
   private readonly repo = "LeetcodeAnalyticsBackend"
-  private readonly filePath = "leetcode_company_questions.csv"
+  private readonly filePath = "codedata.csv"
 
   async getLastCommitInfo(): Promise<GitHubApiResponse> {
     try {

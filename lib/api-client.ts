@@ -60,7 +60,7 @@ class ApiClient {
       logger.info("Fetching CSV data from GitHub")
 
       const response = await fetch(
-        "https://raw.githubusercontent.com/AlliterationofA/LeetcodeAnalyticsBackend/main/leetcode_company_questions.csv",
+        "https://raw.githubusercontent.com/AlliterationofA/LeetcodeAnalyticsBackend/main/codedata.csv",
       )
 
       if (!response.ok) {
