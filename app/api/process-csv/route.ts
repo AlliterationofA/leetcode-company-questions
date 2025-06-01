@@ -69,10 +69,10 @@ export async function POST(request: Request) {
       // Use the GitHub raw URL for the CSV file
       console.log("Fetching CSV data from GitHub repository...")
       try {
-        // const response = await fetch(
-        //   "https://raw.githubusercontent.com/AlliterationofA/LeetcodeAnalyticsBackend/main/leetcode_company_questions.csv",
-        // )
-        const response = "codedata.csv"
+        const response = await fetch(
+          "https://raw.githubusercontent.com/AlliterationofA/LeetcodeAnalyticsBackend/main/codedata.csv",
+        )
+        // const response = "codedata.csv"
         if (!response.ok) {
           throw new Error(`Failed to fetch CSV data: ${response.status}`)
         }
