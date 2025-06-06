@@ -1,7 +1,6 @@
 "use client"
 
 import { Filter, Building2, Gauge, Clock, Tag, Search, X, Layers, GitBranch, Check, ChevronsUpDown, Hash, BarChart, CheckCircle } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -526,6 +525,7 @@ export function FiltersPanel({
                 />
               </div>
             </div>
+
             {/* Frequency Range */}
             <div>
               <label className="block text-xs font-semibold text-muted-foreground mb-1 flex items-center gap-1">
@@ -551,6 +551,7 @@ export function FiltersPanel({
                 />
               </div>
             </div>
+
             {/* Acceptance % Range */}
             <div>
               <label className="block text-xs font-semibold text-muted-foreground mb-1 flex items-center gap-1">
@@ -585,7 +586,7 @@ export function FiltersPanel({
                 <TooltipTrigger asChild>
                   <Button variant={showMultiCompany ? "default" : "outline"} size="sm" onClick={onMultiCompanyToggle}>
                     <Filter className="h-4 w-4 mr-2" />
-                    More-Than-One-Company
+                    Exclude Single Occurences
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
