@@ -18,6 +18,8 @@ import {
   ChevronUp,
   ChevronRight,
   ChevronLeft,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -47,6 +49,10 @@ export function ProblemsTable({
   const [expandedCompanies, setExpandedCompanies] = useState<Set<string>>(new Set())
   const [expandedTopics, setExpandedTopics] = useState<Set<string>>(new Set())
   const [expandedTimeframes, setExpandedTimeframes] = useState<Set<string>>(new Set())
+  const [page, setPage] = useState(1)
+  const rowsPerPage = 25
+  const totalPages = Math.ceil(questions.length / rowsPerPage)
+  const paginatedQuestions = questions.slice((page - 1) * rowsPerPage, page * rowsPerPage)
 
   const toggleRow = (id: string) => {
     const newExpanded = new Set(expandedRows)
@@ -106,11 +112,11 @@ export function ProblemsTable({
     }
   }
 
-  const displayedQuestions = questions
+  const displayedQuestions = paginatedQuestions
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -149,7 +155,9 @@ export function ProblemsTable({
                   className="h-auto p-0 font-semibold hover:bg-transparent"
                 >
                   <Hash className="h-4 w-4 mr-1" />
-                  Occurrences {getSortIcon("occurrences")}
+                  <span className="hidden sm:inline">Occurrences</span>
+                  <span className="sm:hidden">Occ</span>
+                  {getSortIcon("occurrences")}
                 </Button>
               </TableHead>
               <TableHead
@@ -158,7 +166,9 @@ export function ProblemsTable({
               >
                 <div className="flex items-center gap-2">
                   <BarChart className="h-4 w-4 mr-1" />
-                  Frequency {getSortIcon("frequency")}
+                  <span className="hidden sm:inline">Frequency</span>
+                  <span className="sm:hidden">Freq</span>
+                  {getSortIcon("frequency")}
                 </div>
               </TableHead>
               <TableHead
@@ -167,7 +177,9 @@ export function ProblemsTable({
               >
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 mr-1" />
-                  Acceptance {getSortIcon("acceptance_rate")}
+                  <span className="hidden sm:inline">Acceptance</span>
+                  <span className="sm:hidden">Acc%</span>
+                  {getSortIcon("acceptance_rate")}
                 </div>
               </TableHead>
               <TableHead>
@@ -333,8 +345,34 @@ export function ProblemsTable({
         </Table>
       </div>
       {questions.length > 0 && (
-        <div className="text-center py-4 text-muted-foreground">
-          Showing all {questions.length.toLocaleString()} results. Use filters to narrow down the list.
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 py-4 px-2 border-t bg-muted/30 rounded-b-md">
+          <div className="text-sm text-muted-foreground font-medium">
+            Showing <span className="font-semibold text-primary">{((page - 1) * rowsPerPage + 1).toLocaleString()}</span>
+            –<span className="font-semibold text-primary">{Math.min(page * rowsPerPage, questions.length).toLocaleString()}</span>
+            &nbsp;of <span className="font-semibold text-primary">{questions.length.toLocaleString()}</span> results
+          </div>
+          <div className="flex gap-1 items-center flex-wrap">
+            <Button size="icon" variant="ghost" onClick={() => setPage(1)} disabled={page === 1} className="rounded-full"><ChevronsLeft className="w-4 h-4" /></Button>
+            <Button size="icon" variant="ghost" onClick={() => setPage(page - 1)} disabled={page === 1} className="rounded-full"><ChevronLeft className="w-4 h-4" /></Button>
+            {Array.from({ length: totalPages }).map((_, i) =>
+              (i + 1 === page || (i + 1 <= 2 || i + 1 > totalPages - 2 || Math.abs(i + 1 - page) <= 1)) ? (
+                <Button
+                  key={i}
+                  size="sm"
+                  variant={i + 1 === page ? "default" : "outline"}
+                  className={`rounded-full px-3 ${i + 1 === page ? "font-bold" : ""}`}
+                  onClick={() => setPage(i + 1)}
+                  disabled={i + 1 === page}
+                >
+                  {i + 1}
+                </Button>
+              ) : (i === 1 && page > 4) || (i === totalPages - 2 && page < totalPages - 3) ? (
+                <span key={i} className="px-2 text-muted-foreground">…</span>
+              ) : null
+            )}
+            <Button size="icon" variant="ghost" onClick={() => setPage(page + 1)} disabled={page === totalPages} className="rounded-full"><ChevronRight className="w-4 h-4" /></Button>
+            <Button size="icon" variant="ghost" onClick={() => setPage(totalPages)} disabled={page === totalPages} className="rounded-full"><ChevronsRight className="w-4 h-4" /></Button>
+          </div>
         </div>
       )}
     </div>

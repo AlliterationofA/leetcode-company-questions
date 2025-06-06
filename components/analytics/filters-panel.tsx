@@ -498,8 +498,8 @@ export function FiltersPanel({
           </div>
         </div>
         {/* Row 2: Range filters and cross-company button */}
-        <div className="flex flex-col lg:flex-row gap-4 items-start mt-2">
-          <div className="flex flex-1 gap-4">
+        <div className="flex flex-col gap-4 lg:flex-row items-start lg:items-center mt-2">
+          <div className="flex flex-col gap-3 w-full lg:flex-row lg:items-center lg:gap-4 lg:p-2 p-3 rounded-md border bg-muted/30 lg:bg-transparent lg:border-0">
             {/* Occurrences Range */}
             <div>
               <label className="block text-xs font-semibold text-muted-foreground mb-1 flex items-center gap-1">
@@ -511,7 +511,7 @@ export function FiltersPanel({
                   placeholder={occurrencesStats.min.toString()}
                   value={occurrencesRange.min === "" ? occurrencesStats.min : occurrencesRange.min}
                   min={0}
-                  className="w-20 h-10"
+                  className="w-14 h-10 sm:w-20"
                   onChange={e => onOccurrencesRangeChange({ min: e.target.value === "" ? "" : Number(e.target.value), max: occurrencesRange.max })}
                 />
                 <span className="text-muted-foreground">—</span>
@@ -520,7 +520,7 @@ export function FiltersPanel({
                   placeholder={occurrencesStats.max.toString()}
                   value={occurrencesRange.max === "" ? occurrencesStats.max : occurrencesRange.max}
                   min={0}
-                  className="w-20 h-10"
+                  className="w-14 h-10 sm:w-20"
                   onChange={e => onOccurrencesRangeChange({ min: occurrencesRange.min, max: e.target.value === "" ? "" : Number(e.target.value) })}
                 />
               </div>
@@ -537,7 +537,7 @@ export function FiltersPanel({
                   placeholder={frequencyStats.min.toString()}
                   value={frequencyRange.min === "" ? frequencyStats.min : frequencyRange.min}
                   min={0}
-                  className="w-20 h-10"
+                  className="w-14 h-10 sm:w-20"
                   onChange={e => onFrequencyRangeChange({ min: e.target.value === "" ? "" : Number(e.target.value), max: frequencyRange.max })}
                 />
                 <span className="text-muted-foreground">—</span>
@@ -546,7 +546,7 @@ export function FiltersPanel({
                   placeholder={frequencyStats.max.toString()}
                   value={frequencyRange.max === "" ? frequencyStats.max : frequencyRange.max}
                   min={0}
-                  className="w-20 h-10"
+                  className="w-14 h-10 sm:w-20"
                   onChange={e => onFrequencyRangeChange({ min: frequencyRange.min, max: e.target.value === "" ? "" : Number(e.target.value) })}
                 />
               </div>
@@ -564,7 +564,7 @@ export function FiltersPanel({
                   value={acceptanceRange.min === "" ? acceptanceStats.min : acceptanceRange.min}
                   min={0}
                   max={100}
-                  className="w-20 h-10"
+                  className="w-14 h-10 sm:w-20"
                   onChange={e => onAcceptanceRangeChange({ min: e.target.value === "" ? "" : Number(e.target.value), max: acceptanceRange.max })}
                 />
                 <span className="text-muted-foreground">—</span>
@@ -574,13 +574,13 @@ export function FiltersPanel({
                   value={acceptanceRange.max === "" ? acceptanceStats.max : acceptanceRange.max}
                   min={0}
                   max={100}
-                  className="w-20 h-10"
+                  className="w-14 h-10 sm:w-20"
                   onChange={e => onAcceptanceRangeChange({ min: acceptanceRange.min, max: e.target.value === "" ? "" : Number(e.target.value) })}
                 />
               </div>
             </div>
           </div>
-          <div className="flex-shrink-0 mt-2 lg:mt-0">
+          <div className="flex-shrink-0 mt-2 lg:mt-0 lg:ml-4 lg:self-center">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
