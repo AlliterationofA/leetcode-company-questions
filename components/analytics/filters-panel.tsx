@@ -1,6 +1,7 @@
 "use client"
 
 import { Filter, Building2, Gauge, Clock, Tag, Search, X, Layers, GitBranch, Check, ChevronsUpDown, Hash, BarChart, CheckCircle } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -9,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { useState, useMemo, useRef } from "react"
+import { useState, useMemo } from "react"
 
 interface FiltersPanelProps {
   selectedCompanies: string[]
@@ -103,11 +104,6 @@ export function FiltersPanel({
     onTopicsChange(selectedTopics.filter(t => t !== topic))
   }
 
-  const companyFilterRef = useRef<HTMLDivElement>(null)
-  const difficultiesFilterRef = useRef<HTMLDivElement>(null)
-  const timeframesFilterRef = useRef<HTMLDivElement>(null)
-  const topicsFilterRef = useRef<HTMLDivElement>(null)
-
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -130,7 +126,7 @@ export function FiltersPanel({
         {/* Row 1: Main dropdown filters */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Companies Filter */}
-          <div className="space-y-2" ref={companyFilterRef}>
+          <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Popover open={openCompany} onOpenChange={setOpenCompany}>
                 <PopoverTrigger asChild>
@@ -149,7 +145,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" side="bottom" sideOffset={4} sticky="always" collisionBoundary={companyFilterRef.current} avoidCollisions={false}>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
                   <Command>
                     <CommandInput
                       placeholder="Search companies..."
@@ -240,7 +236,7 @@ export function FiltersPanel({
           </div>
 
           {/* Difficulties Filter */}
-          <div className="space-y-2" ref={difficultiesFilterRef}>
+          <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Popover>
                 <PopoverTrigger asChild>
@@ -260,7 +256,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" side="bottom" sideOffset={4} sticky="always" collisionBoundary={difficultiesFilterRef.current} avoidCollisions={false}>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
                   <Command>
                     <CommandGroup>
                       <div className="flex flex-wrap gap-2 p-2">
@@ -322,7 +318,7 @@ export function FiltersPanel({
           </div>
 
           {/* Timeframes Filter */}
-          <div className="space-y-2" ref={timeframesFilterRef}>
+          <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Popover>
                 <PopoverTrigger asChild>
@@ -340,7 +336,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" side="bottom" sideOffset={4} sticky="always" collisionBoundary={timeframesFilterRef.current} avoidCollisions={false}>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
                   <Command>
                     <CommandGroup className="max-h-[300px] overflow-auto p-2">
                       <div className="flex flex-wrap gap-2">
@@ -388,7 +384,7 @@ export function FiltersPanel({
           </div>
 
           {/* Topics Filter */}
-          <div className="space-y-2" ref={topicsFilterRef}>
+          <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Popover open={openTopic} onOpenChange={setOpenTopic}>
                 <PopoverTrigger asChild>
@@ -407,7 +403,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" side="bottom" sideOffset={4} sticky="always" collisionBoundary={topicsFilterRef.current} avoidCollisions={false}>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
                   <Command>
                     <CommandInput
                       placeholder="Search topics..."
@@ -525,7 +521,6 @@ export function FiltersPanel({
                 />
               </div>
             </div>
-
             {/* Frequency Range */}
             <div>
               <label className="block text-xs font-semibold text-muted-foreground mb-1 flex items-center gap-1">
@@ -551,7 +546,6 @@ export function FiltersPanel({
                 />
               </div>
             </div>
-
             {/* Acceptance % Range */}
             <div>
               <label className="block text-xs font-semibold text-muted-foreground mb-1 flex items-center gap-1">
@@ -586,7 +580,7 @@ export function FiltersPanel({
                 <TooltipTrigger asChild>
                   <Button variant={showMultiCompany ? "default" : "outline"} size="sm" onClick={onMultiCompanyToggle}>
                     <Filter className="h-4 w-4 mr-2" />
-                    Exclude Single Occurences
+                    Cross-Company Only
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
