@@ -157,17 +157,15 @@ export function ResourcesSection({ resources }: ResourcesSectionProps) {
           >
             {/* Favicon */}
             <div className="flex-shrink-0 mb-2">
-              {resource.favicon ? (
-                <img
-                  src={resource.favicon}
-                  alt={resource.title + ' favicon'}
-                  className="w-10 h-10 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white object-contain"
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400">
-                  <Wrench className="h-5 w-5" />
-                </div>
-              )}
+              <img
+                src={resource.favicon ? resource.favicon : `https://www.google.com/s2/favicons?domain=${new URL(resource.url).hostname}`}
+                alt={resource.title + ' favicon'}
+                className="w-10 h-10 rounded-lg border border-zinc-100 dark:border-zinc-800 bg-white object-contain"
+                onError={e => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(resource.title)}&background=random`;
+                }}
+              />
             </div>
             {/* Title */}
             <div className="font-semibold text-center text-base mb-1 truncate w-full group-hover:text-primary transition-colors duration-200">{resource.title}</div>
