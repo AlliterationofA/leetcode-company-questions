@@ -1,65 +1,43 @@
-# Background and Motivation
-The repository has accumulated code, configuration, and dependencies that may no longer be referenced anywhere in the application. Cleaning the project improves maintainability, reduces build size and attack surface, and speeds up developer workflows.
 
-# Key Challenges and Analysis
-1. **Accurate Detection**: Identifying genuinely unused files, exports, and packages without false-positives that could break runtime behavior.
-2. **Tool Choice & Configuration**: Selecting static-analysis tools (e.g. `ts-prune`, `depcheck`) and configuring TypeScript project references correctly so results are reliable.
-3. **Verification**: Ensuring removal does not break compile, test, or runtime. Requires regression test suite and manual smoke tests.
-4. **Incremental Cleanup**: Large deletions should be performed in small verifiable commits.
 
-# High-level Task Breakdown
-1. ✅ Baseline Validation: Install dependencies and verify build
-2. ✅ Inventory Codebase: Document structure and entry points
-3. ✅ Detect Unused Exports: Run ts-prune to find unused TypeScript exports
-4. ✅ Analyze Dependencies: Run depcheck to find unused packages
-5. ✅ Classify Changes: Determine what's safe to delete vs keep
-6. ✅ Remove Unused Code: Delete unused files and dependencies
-7. ✅ Verify and Document Changes
-8. 🔄 Final Review and Cleanup
+# SEO Optimization Phase (May 2025)
 
-# Project Status Board
-## Completed Changes
-- ✅ Removed unused `components/ui/header.tsx`
-- ✅ Removed duplicate `components/ui/use-mobile.tsx` (main version in hooks/)
-- ✅ Removed unused Node.js built-in modules (`fs`, `path`) from package.json
-- ✅ Verified build passes after changes
+## Background and Motivation
+The site is publicly accessible and should rank well for queries like "LeetCode company questions analytics". At the moment it only contains a basic `<title>` and `<description>` in `app/layout.tsx`. Enhancing on-page SEO (meta tags, Open Graph, structured data) and crawlability (sitemap, robots.txt) will increase discoverability without changing the visual UI.
 
-## Final Review Findings
-1. Remaining "Unused" Dependencies (Must Keep):
-   - `@hookform/resolvers`, `zod`: Used for form validation (dynamically imported)
-   - `autoprefixer`, `postcss`: Required by Tailwind CSS
-   - `date-fns`: Used for date formatting (dynamically imported)
-   - `typescript`: Required for TypeScript compilation
-   - `depcheck`, `ts-prune`: Development tools for code analysis
+## Key Challenges and Analysis
+1. **Comprehensive Metadata** – Next.js `Metadata` object must include title templates, canonical URLs, Open Graph, Twitter cards, keywords, and icons while avoiding duplication.
+2. **Automated Sitemap Generation** – Keep the sitemap up-to-date as routes grow. `next-sitemap` integrates well but needs correct `siteUrl` and build hooks.
+3. **No Visual Changes** – All work must be non-visual; any optional UI suggestions will be postponed to a later task.
+4. **Performance & Validation** – Ensure new tags don't inflate bundle size and pass HTML validation & Lighthouse SEO checks.
 
-2. Remaining "Unused" Exports (Must Keep):
-   - Default exports in `tailwind.config.ts` and `app/loading.tsx`: Required by Next.js conventions
-   - `Toaster` in `components/ui/toaster.tsx`: Used in toast notification system
-   - Various UI component exports: Used through dynamic imports or required by the component library
+## High-level Task Breakdown
+1. 🔄 **Audit Baseline SEO**
+   • Run Lighthouse SEO audit & manual source inspection. Document missing/weak areas.
+   • _Success criteria_: Written audit report in scratchpad.
+2. 🔄 **Site-wide Metadata Enhancements**
+   • Extend `app/layout.tsx` export `metadata` with `titleTemplate`, `keywords`, author, themeColor, Open Graph defaults, Twitter card, generator.
+   • _Success criteria_: Build succeeds, html `<head>` shows new tags.
+3. 🔄 **Canonical & Alternate Links**
+   • Add canonical URL helper to ensure each page includes `<link rel="canonical">`.
+   • _Success criteria_: Root page contains canonical link pointing to production domain.
+4. 🔄 **Robots and Sitemap**
+   • Add and configure `next-sitemap` (or manual route) to emit `/sitemap.xml` and `/robots.txt`.
+   • _Success criteria_: Visiting `/sitemap.xml` locally shows correct XML; Lighthouse reports sitemap.
+5. 🔄 **Structured Data (JSON-LD)**
+   • Inject Site-level `Organization` schema in `app/layout.tsx`.
+   • _Success criteria_: Rich-results test passes with no errors.
+6. 🔄 **Verification & Lighthouse Re-run**
+   • Re-run Lighthouse. Aim for SEO score ≥ 95.
+   • _Success criteria_: Report pasted in scratchpad and score target met.
 
-3. Build Health:
-   - Build Size: Optimized (101 kB shared, 287 kB main route)
-   - No TypeScript errors
-   - No runtime errors
-   - All routes functional
+## Project Status Board
+- [ ] Audit Baseline SEO 🔄
+- [ ] Site-wide Metadata Enhancements 🔄
+- [ ] Canonical & Alternate Links 🔄
+- [ ] Robots and Sitemap 🔄
+- [ ] Structured Data (JSON-LD) 🔄
+- [ ] Verification & Lighthouse Re-run 🔄
 
-# Executor's Feedback or Assistance Requests
-- Final review complete
-- All identified unused code has been safely removed
-- Remaining "unused" items are false positives that are actually required
-- Project is in a clean, optimized state
-
-# Lessons
-1. Node.js built-in modules (`fs`, `path`) were listed as dependencies but aren't needed in browser-side Next.js code
-2. Duplicate hooks should be consolidated in a single location (hooks directory)
-3. Components not imported anywhere can be safely removed after thorough verification
-4. Static analysis tools may report false positives for:
-   - Dynamically imported dependencies
-   - Framework-required files
-   - Development tools
-5. Always verify build and runtime behavior after removing code
-
-The cleanup process is now complete. Would you like to:
-1. Commit the changes
-2. Run additional verification
-3. Something else? 
+## Executor's Feedback or Assistance Requests
+*(No updates yet – executor will fill during implementation)* 
