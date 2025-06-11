@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useMemo, useRef } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
   Search,
   TrendingUp,
@@ -89,161 +89,9 @@ export default function LeetCodeAnalytics() {
   }, [data])
 
   // Filters and sorting
-  const [occurrencesRange, setOccurrencesRange] = useState<{ min: number | ""; max: number | "" }>({ min: 1, max: 278 })
-  const [frequencyRange, setFrequencyRange] = useState<{ min: number | ""; max: number | "" }>({ min: 5, max: 100 })
-  const [acceptanceRange, setAcceptanceRange] = useState<{ min: number | ""; max: number | "" }>({ min: 0, max: 100 })
-
-  // Add state for expanded company and timeframe
-  const [expandedCompany, setExpandedCompany] = useState<string | null>(null)
-  const [expandedTimeframe, setExpandedTimeframe] = useState<string | null>(null)
-
-  // Add a ref for the Tabs component
-  const tabsRef = useRef<any>(null)
-  const [activeTab, setActiveTab] = useState('problems')
-
-  // Helper to get problems for a company and timeframe
-  function getCompanyProblems(companyName: string, timeframe: string | null) {
-    if (!data) return []
-    let filtered = data.questions.filter(q => q.companies.includes(companyName))
-    if (timeframe && timeframe !== "total") {
-      filtered = filtered.filter(q => q.timeframes.includes(timeframe))
-    }
-    return filtered
-  }
-
-  // Helper to get filtered problems for a company and timeframe, matching Problems tab logic
-  function getFilteredProblemsForCompany(companyName: string, timeframe: string | null) {
-    if (!data) return []
-    // Use the same logic as filteredAndSortedQuestions, but only for the given company and timeframe
-    return data.questions.filter((question) => {
-      // Company filter: must include the company
-      if (!question.companies.includes(companyName)) return false
-      // Timeframe filter
-      if (timeframe && timeframe !== 'total' && !question.timeframes.includes(timeframe)) return false
-      // No other filters applied here (since Companies tab is for raw counts)
-      return true
-    })
-  }
-
-  // Extracted filtering logic for Problems tab and Companies tab stat counts
-  function getFilteredQuestions({
-    company = null,
-    timeframe = null,
-    search = "",
-    difficulties = [],
-    topics = [],
-    showMultiCompany = false,
-    companyFilterMode = "or",
-    topicFilterMode = "or",
-    occurrencesRange = occurrencesStats,
-    frequencyRange = frequencyStats,
-    acceptanceRange = acceptanceStats,
-  }: {
-    company?: string | null;
-    timeframe?: string | null;
-    search?: string;
-    difficulties?: string[];
-    topics?: string[];
-    showMultiCompany?: boolean;
-    companyFilterMode?: 'and' | 'or';
-    topicFilterMode?: 'and' | 'or';
-    occurrencesRange?: { min: number; max: number };
-    frequencyRange?: { min: number; max: number };
-    acceptanceRange?: { min: number; max: number };
-  }) {
-    if (!data) return []
-    const occMin = typeof occurrencesRange.min === "number" ? occurrencesRange.min : occurrencesStats.min
-    const occMax = typeof occurrencesRange.max === "number" ? occurrencesRange.max : occurrencesStats.max
-    const freqMin = typeof frequencyRange.min === "number" ? frequencyRange.min : frequencyStats.min
-    const freqMax = typeof frequencyRange.max === "number" ? frequencyRange.max : frequencyStats.max
-    const accMin = typeof acceptanceRange.min === "number" ? acceptanceRange.min : acceptanceStats.min
-    const accMax = typeof acceptanceRange.max === "number" ? acceptanceRange.max : acceptanceStats.max
-    return data.questions.filter((question) => {
-      // Check if any of the original rows match the filters
-      const hasMatchingRow = question.originalRows?.some((row) => {
-        // Search filter
-        if (search) {
-          const searchLower = search.toLowerCase()
-          const matchesSearch =
-            row.title?.toLowerCase().includes(searchLower) || row.topics?.toLowerCase().includes(searchLower)
-          if (!matchesSearch) return false
-        }
-        // Company filter
-        if (company && typeof company === 'string') {
-          if (companyFilterMode === "and") {
-            const questionCompanies = new Set(question.companies)
-            if (!company.split(",").every((c: string) => questionCompanies.has(c))) {
-              return false
-            }
-          } else {
-            if (row.company !== company) {
-              return false
-            }
-          }
-        }
-        // Difficulty filter
-        if (difficulties.length > 0 && !difficulties.includes(row.difficulty)) {
-          return false
-        }
-        // Timeframe filter
-        if (timeframe && typeof timeframe === 'string' && timeframe !== "total" && row.timeframe !== timeframe) {
-          return false
-        }
-        // Topic filter
-        if (topics.length > 0) {
-          const rowTopics = row.topics?.split(/[,;|]/).map((t) => t.trim()) || []
-          if (topicFilterMode === "and") {
-            if (!topics.every(topic => rowTopics.includes(topic))) {
-              return false
-            }
-          } else {
-            if (!topics.some(topic => rowTopics.includes(topic))) {
-              return false
-            }
-          }
-        }
-        // Occurrences filter
-        const occurrences = question.originalRows?.length || 0
-        if (occurrences < occMin || occurrences > occMax) return false
-        // Frequency filter
-        if (question.frequency < freqMin || question.frequency > freqMax) return false
-        // Acceptance filter
-        if (question.acceptance_rate < accMin || question.acceptance_rate > accMax) return false
-        return true
-      })
-      if (!hasMatchingRow) return false
-      if (showMultiCompany && question.companies.length <= 1) {
-        return false
-      }
-      return true
-    })
-  }
-
-  // Memoized map of company/timeframe counts for Companies tab
-  const companyTimeframeCounts = useMemo(() => {
-    if (!data) return {}
-    const timeframes = ["total", "1 Month", "3 Months", "6 Months", "More Than 6 Months"]
-    const result: Record<string, Record<string, number>> = {}
-    for (const company of data.companies) {
-      result[company.name] = {}
-      for (const timeframe of timeframes) {
-        result[company.name][timeframe] = getFilteredQuestions({
-          company: company.name,
-          timeframe: timeframe === 'total' ? null : timeframe,
-          search: "",
-          difficulties: [],
-          topics: [],
-          showMultiCompany: false,
-          companyFilterMode: 'or',
-          topicFilterMode: 'or',
-          occurrencesRange: occurrencesStats,
-          frequencyRange: frequencyStats,
-          acceptanceRange: acceptanceStats,
-        }).length
-      }
-    }
-    return result
-  }, [data, occurrencesStats, frequencyStats, acceptanceStats])
+  const [occurrencesRange, setOccurrencesRange] = useState<{ min: number | ""; max: number | "" }>({ min: "", max: "" })
+  const [frequencyRange, setFrequencyRange] = useState<{ min: number | ""; max: number | "" }>({ min: "", max: "" })
+  const [acceptanceRange, setAcceptanceRange] = useState<{ min: number | ""; max: number | "" }>({ min: "", max: "" })
 
   // Clear success message after 5 seconds
   useEffect(() => {
@@ -387,12 +235,12 @@ export default function LeetCodeAnalytics() {
     })
 
     // Get effective min/max for each range
-    const occMin = typeof occurrencesRange.min === "number" ? occurrencesRange.min : 1
-    const occMax = typeof occurrencesRange.max === "number" ? occurrencesRange.max : 278
-    const freqMin = typeof frequencyRange.min === "number" ? frequencyRange.min : 5
-    const freqMax = typeof frequencyRange.max === "number" ? frequencyRange.max : 100
-    const accMin = typeof acceptanceRange.min === "number" ? acceptanceRange.min : 0
-    const accMax = typeof acceptanceRange.max === "number" ? acceptanceRange.max : 100
+    const occMin = occurrencesRange.min === "" ? occurrencesStats.min : occurrencesRange.min
+    const occMax = occurrencesRange.max === "" ? occurrencesStats.max : occurrencesRange.max
+    const freqMin = frequencyRange.min === "" ? frequencyStats.min : frequencyRange.min
+    const freqMax = frequencyRange.max === "" ? frequencyStats.max : frequencyRange.max
+    const accMin = acceptanceRange.min === "" ? acceptanceStats.min : acceptanceRange.min
+    const accMax = acceptanceRange.max === "" ? acceptanceStats.max : acceptanceRange.max
 
     // Filter questions based on their original CSV rows to maintain data integrity
     const filtered = data.questions.filter((question) => {
@@ -531,12 +379,6 @@ export default function LeetCodeAnalytics() {
     acceptanceStats,
   ])
 
-  // Add date formatting helper
-  function formatDate(dateString: string) {
-    const date = new Date(dateString)
-    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -653,9 +495,9 @@ export default function LeetCodeAnalytics() {
                 <CardTitle className="text-xs font-medium whitespace-nowrap">Total Problems</CardTitle>
                 <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col justify-end px-4 pb-3 pt-0 min-h-0">
-                <div className="text-2xl font-bold leading-tight mb-1 truncate">{data.stats.totalProblems.toLocaleString()}</div>
-                <div className="text-xs text-muted-foreground truncate">Unique problems tracked</div>
+              <CardContent>
+                <div className="text-2xl font-bold">{data.stats.totalProblems.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">Unique problems tracked</p>
               </CardContent>
             </Card>
 
@@ -665,9 +507,9 @@ export default function LeetCodeAnalytics() {
                 <CardTitle className="text-xs font-medium whitespace-nowrap">Companies</CardTitle>
                 <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col justify-end px-4 pb-3 pt-0 min-h-0">
-                <div className="text-2xl font-bold leading-tight mb-1 truncate">{data.stats.totalCompanies.toLocaleString()}</div>
-                <div className="text-xs text-muted-foreground truncate">Tech companies tracked</div>
+              <CardContent>
+                <div className="text-2xl font-bold">{data.stats.totalCompanies}</div>
+                <p className="text-xs text-muted-foreground">Tech companies tracked</p>
               </CardContent>
             </Card>
 
@@ -677,13 +519,13 @@ export default function LeetCodeAnalytics() {
                 <CardTitle className="text-xs font-medium whitespace-nowrap">Avg Frequency</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col justify-end px-4 pb-3 pt-0 min-h-0">
-                <div className="text-2xl font-bold leading-tight mb-1 truncate">
+              <CardContent>
+                <div className="text-2xl font-bold">
                   {data.questions.length > 0
                     ? (data.questions.reduce((sum, q) => sum + q.frequency, 0) / data.questions.length).toFixed(1)
                     : "0"}
                 </div>
-                <div className="text-xs text-muted-foreground truncate">Average problem frequency</div>
+                <p className="text-xs text-muted-foreground">Average problem frequency</p>
               </CardContent>
             </Card>
 
@@ -693,13 +535,14 @@ export default function LeetCodeAnalytics() {
                 <CardTitle className="text-xs font-medium whitespace-nowrap">Avg Acceptance</CardTitle>
                 <Code className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col justify-end px-4 pb-3 pt-0 min-h-0">
-                <div className="text-2xl font-bold leading-tight mb-1 truncate">
+              <CardContent>
+                <div className="text-2xl font-bold">
                   {data.questions.length > 0
-                    ? (data.questions.reduce((sum, q) => sum + q.acceptance_rate, 0) / data.questions.length).toFixed(2) + "%"
-                    : "0%"}
+                    ? (data.questions.reduce((sum, q) => sum + q.acceptance_rate, 0) / data.questions.length).toFixed(2)
+                    : "0"}
+                  %
                 </div>
-                <div className="text-xs text-muted-foreground truncate">Average acceptance rate</div>
+                <p className="text-xs text-muted-foreground">Average acceptance rate</p>
               </CardContent>
             </Card>
 
@@ -722,15 +565,19 @@ export default function LeetCodeAnalytics() {
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
               <TabsTrigger value="problems" className="flex items-center gap-2">
                 <ListChecks className="h-4 w-4" />
-                <span className="hidden sm:inline">Problems</span>
+                Problems
               </TabsTrigger>
               <TabsTrigger value="companies" className="flex items-center gap-2">
                 <Building2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Companies</span>
+                Companies
               </TabsTrigger>
-              <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <TabsTrigger value="overview" className="flex items-center gap-2">
+                <LayoutDashboard className="h-4 w-4" />
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="trends" className="flex items-center gap-2">
                 <BarChart2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Analytics</span>
+                Analytics
               </TabsTrigger>
               <TabsTrigger value="resources" className="flex items-center gap-2">
                 <Wrench className="h-4 w-4" />
@@ -738,8 +585,8 @@ export default function LeetCodeAnalytics() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="problems" className="space-y-4 md:space-y-6" id="problems-section">
-              {/* Filters Panel */}
+            <TabsContent value="problems" className="space-y-6" id="problems-section">
+              {/* Filters */}
               <FiltersPanel
                 selectedCompanies={selectedCompanies}
                 selectedDifficulties={selectedDifficulties}
@@ -772,115 +619,58 @@ export default function LeetCodeAnalytics() {
                 acceptanceStats={acceptanceStats}
               />
 
-              {/* Problems Table Title Row with Reset Filters Button */}
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                  Problems ({filteredAndSortedQuestions.length.toLocaleString()})
-                </h2>
-                {(
-                  selectedCompanies.length > 0 ||
-                  selectedDifficulties.length > 0 ||
-                  selectedTimeframes.length > 0 ||
-                  selectedTopics.length > 0 ||
-                  showMultiCompany ||
-                  companyFilterMode !== 'or' ||
-                  topicFilterMode !== 'or' ||
-                  occurrencesRange.min !== occurrencesStats.min ||
-                  occurrencesRange.max !== occurrencesStats.max ||
-                  frequencyRange.min !== frequencyStats.min ||
-                  frequencyRange.max !== frequencyStats.max ||
-                  acceptanceRange.min !== acceptanceStats.min ||
-                  acceptanceRange.max !== acceptanceStats.max
-                ) && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedCompanies([])
-                      setSelectedDifficulties([])
-                      setSelectedTimeframes([])
-                      setSelectedTopics([])
-                      setShowMultiCompany(false)
-                      setCompanyFilterMode('or')
-                      setTopicFilterMode('or')
-                      setOccurrencesRange({ min: occurrencesStats.min, max: occurrencesStats.max })
-                      setFrequencyRange({ min: frequencyStats.min, max: frequencyStats.max })
-                      setAcceptanceRange({ min: acceptanceStats.min, max: acceptanceStats.max })
-                    }}
-                  >
-                    Reset Filters
-                  </Button>
-                )}
-              </div>
-
               {/* Problems Table */}
               <ProblemsTable
                 questions={filteredAndSortedQuestions}
                 sortField={sortField}
                 sortDirection={sortDirection}
                 onSort={handleSort}
+                maxDisplayCount={100}
               />
             </TabsContent>
 
-            <TabsContent value="companies" className="space-y-4 md:space-y-6">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <TabsContent value="companies" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {data.companies.map((company) => (
-                  <Card 
-                    key={company.name} 
-                    className="hover:shadow-md transition-shadow cursor-pointer"
-                  >
-                    <CardHeader>
-                      <div className="flex items-center gap-3">
-                        <img 
-                          src={`https://logo.clearbit.com/${company.name.toLowerCase().replace(/\s+/g, '')}.com`}
-                          alt={`${company.name} logo`}
-                          className="w-8 h-8 rounded"
-                          onError={(e) => {
-                            e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(company.name) + '&background=random';
-                          }}
-                        />
-                        <div>
-                          <CardTitle className="text-lg">{company.name}</CardTitle>
-                          <CardDescription>Problem statistics</CardDescription>
-                        </div>
-                      </div>
+                  <Card key={company.name} className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg">{company.name}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        {[
-                          { label: "Total Problems", timeframe: "total" },
-                          { label: "30 Days", timeframe: "1 Month" },
-                          { label: "3 Months", timeframe: "3 Months" },
-                          { label: "6 Months", timeframe: "6 Months" },
-                          { label: "More Than 6 Months", timeframe: "More Than 6 Months" },
-                        ].map((section) => (
-                          <div key={section.label}>
-                            <button
-                              className="flex items-center justify-between w-full text-left py-1 px-2 rounded hover:bg-muted focus:outline-none"
-                              onClick={() => {
-                                setSelectedCompanies([company.name])
-                                setSelectedDifficulties([] as string[])
-                                setSelectedTimeframes(section.timeframe === "total" ? [] : [section.timeframe as string])
-                                setSelectedTopics([] as string[])
-                                setShowMultiCompany(false)
-                                setCompanyFilterMode('or')
-                                setTopicFilterMode('or')
-                                setOccurrencesRange({ min: occurrencesStats.min, max: occurrencesStats.max })
-                                setFrequencyRange({ min: frequencyStats.min, max: frequencyStats.max })
-                                setAcceptanceRange({ min: acceptanceStats.min, max: acceptanceStats.max })
-                                setActiveTab('problems');
-                                // Scroll to problems section
-                                const problemsSection = document.getElementById('problems-section');
-                                if (problemsSection) {
-                                  setTimeout(() => problemsSection.scrollIntoView({ behavior: 'smooth' }), 100);
-                                }
-                              }}
-                            >
-                              <span className="font-medium text-sm">{section.label}:</span>
-                              <span className="font-mono text-base">{companyTimeframeCounts[company.name]?.[section.timeframe] ?? 0}</span>
-                            </button>
-                          </div>
-                        ))}
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm flex items-center gap-1">
+                            <Target className="h-3 w-3" />
+                            Total Problems:
+                          </span>
+                          <span className="font-semibold">{company.totalProblems}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            30 Days:
+                          </span>
+                          <span>{company.thirtyDays}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />3 Months:
+                          </span>
+                          <span>{company.threeMonths}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm flex items-center gap-1">
+                            <CalendarClock className="h-3 w-3" />6 Months:
+                          </span>
+                          <span>{company.sixMonths}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm flex items-center gap-1">
+                            <History className="h-3 w-3" />
+                            More Than 6 Months:
+                          </span>
+                          <span>{company.moreThanSixMonths}</span>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -888,8 +678,8 @@ export default function LeetCodeAnalytics() {
               </div>
             </TabsContent>
 
-            <TabsContent value="analytics" className="space-y-4 md:space-y-6">
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <TabsContent value="overview" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Difficulty Distribution */}
                 <Card>
                   <CardHeader>
@@ -903,7 +693,7 @@ export default function LeetCodeAnalytics() {
                         medium: { label: "Medium", color: "#f59e0b" },
                         hard: { label: "Hard", color: "#ef4444" },
                       }}
-                      className="h-[250px] md:h-[300px]"
+                      className="h-[300px]"
                     >
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
@@ -915,8 +705,6 @@ export default function LeetCodeAnalytics() {
                             outerRadius={100}
                             paddingAngle={5}
                             dataKey="value"
-                            label={({ name, value }) => `${name}: ${value}`}
-                            labelLine={false}
                           >
                             {data.stats.difficultyDistribution.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={entry.color} />
@@ -939,7 +727,7 @@ export default function LeetCodeAnalytics() {
                       config={{
                         problems: { label: "Problems", color: "hsl(var(--chart-1))" },
                       }}
-                      className="h-[250px] md:h-[300px]"
+                      className="h-[300px]"
                     >
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={data.companies.slice(0, 10)}>
@@ -952,29 +740,42 @@ export default function LeetCodeAnalytics() {
                     </ChartContainer>
                   </CardContent>
                 </Card>
+              </div>
+            </TabsContent>
 
+            <TabsContent value="trends" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Timeframe Distribution */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Timeframe Distribution</CardTitle>
-                    <CardDescription>Problems by timeframe</CardDescription>
+                    <CardDescription>Problems by timeframe across all companies</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ChartContainer
-                      config={{
-                        problems: { label: "Problems", color: "hsl(var(--chart-2))" },
-                      }}
-                      className="h-[250px] md:h-[300px]"
-                    >
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data.stats.timeframeDistribution}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-                          <YAxis />
-                          <Bar dataKey="value" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </ChartContainer>
+                    <div className="space-y-4">
+                      {data.stats.timeframeDistribution.map((timeframe) => {
+                        const percentage =
+                          data.stats.totalProblems > 0 ? (timeframe.value / data.stats.totalProblems) * 100 : 0
+
+                        return (
+                          <div key={timeframe.name} className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="font-medium">{timeframe.name}</div>
+                              <Badge variant="outline">{timeframe.value} problems</Badge>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-32 bg-muted rounded-full h-2">
+                                <div
+                                  className="bg-primary h-2 rounded-full transition-all"
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                              <span className="text-sm text-muted-foreground w-12">{percentage.toFixed(1)}%</span>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -982,21 +783,21 @@ export default function LeetCodeAnalytics() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Top Topics</CardTitle>
-                    <CardDescription>Most common problem topics</CardDescription>
+                    <CardDescription>Most frequently used problem topics</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ChartContainer
                       config={{
-                        problems: { label: "Problems", color: "hsl(var(--chart-3))" },
+                        count: { label: "Count", color: "hsl(var(--chart-2))" },
                       }}
-                      className="h-[250px] md:h-[300px]"
+                      className="h-[300px]"
                     >
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={data.stats.topTopics.slice(0, 10)}>
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
                           <YAxis />
-                          <Bar dataKey="count" fill="hsl(var(--chart-3))" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="count" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </ChartContainer>

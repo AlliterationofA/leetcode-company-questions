@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import {
   ArrowUpDown,
   ArrowUp,
@@ -27,7 +26,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import type { Question } from "@/lib/csv-processor"
-import { cn } from "@/lib/utils"
 
 type SortField = "title" | "difficulty" | "frequency" | "acceptance_rate" | "timeframe" | "occurrences"
 type SortDirection = "asc" | "desc"
@@ -45,6 +43,7 @@ export function ProblemsTable({
   sortDirection,
   onSort,
 }: ProblemsTableProps) {
+
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
   const [expandedCompanies, setExpandedCompanies] = useState<Set<string>>(new Set())
   const [expandedTopics, setExpandedTopics] = useState<Set<string>>(new Set())
@@ -350,6 +349,7 @@ export function ProblemsTable({
             Showing <span className="font-semibold text-primary">{((page - 1) * rowsPerPage + 1).toLocaleString()}</span>
             –<span className="font-semibold text-primary">{Math.min(page * rowsPerPage, questions.length).toLocaleString()}</span>
             &nbsp;of <span className="font-semibold text-primary">{questions.length.toLocaleString()}</span> results
+
           </div>
           <div className="flex gap-1 items-center flex-wrap">
             <Button size="icon" variant="ghost" onClick={() => setPage(1)} disabled={page === 1} className="rounded-full"><ChevronsLeft className="w-4 h-4" /></Button>
