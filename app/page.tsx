@@ -73,12 +73,12 @@ export default function LeetCodeAnalytics() {
 
   // Calculate min/max for range filters
   const occurrencesStats = useMemo(() => {
-    if (!data) return { min: 1, max: 278 }
+    if (!data) return { min: 1, max: 500 }
     const values = data.questions.map(q => q.originalRows?.length || 0)
     return { min: Math.min(...values), max: Math.max(...values) }
   }, [data])
   const frequencyStats = useMemo(() => {
-    if (!data) return { min: 5, max: 100 }
+    if (!data) return { min: 0, max: 100 }
     const values = data.questions.map(q => q.frequency || 0)
     return { min: Math.min(...values), max: Math.max(...values) }
   }, [data])
@@ -89,8 +89,8 @@ export default function LeetCodeAnalytics() {
   }, [data])
 
   // Filters and sorting
-  const [occurrencesRange, setOccurrencesRange] = useState<{ min: number | ""; max: number | "" }>({ min: 1, max: 278 })
-  const [frequencyRange, setFrequencyRange] = useState<{ min: number | ""; max: number | "" }>({ min: 5, max: 100 })
+  const [occurrencesRange, setOccurrencesRange] = useState<{ min: number | ""; max: number | "" }>({ min: 1, max: 500 })
+  const [frequencyRange, setFrequencyRange] = useState<{ min: number | ""; max: number | "" }>({ min: 0, max: 100 })
   const [acceptanceRange, setAcceptanceRange] = useState<{ min: number | ""; max: number | "" }>({ min: 0, max: 100 })
 
   // Add state for expanded company and timeframe
@@ -388,8 +388,8 @@ export default function LeetCodeAnalytics() {
 
     // Get effective min/max for each range
     const occMin = typeof occurrencesRange.min === "number" ? occurrencesRange.min : 1
-    const occMax = typeof occurrencesRange.max === "number" ? occurrencesRange.max : 278
-    const freqMin = typeof frequencyRange.min === "number" ? frequencyRange.min : 5
+    const occMax = typeof occurrencesRange.max === "number" ? occurrencesRange.max : 500
+    const freqMin = typeof frequencyRange.min === "number" ? frequencyRange.min : 0
     const freqMax = typeof frequencyRange.max === "number" ? frequencyRange.max : 100
     const accMin = typeof acceptanceRange.min === "number" ? acceptanceRange.min : 0
     const accMax = typeof acceptanceRange.max === "number" ? acceptanceRange.max : 100
