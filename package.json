@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-images": "node scripts/generate-images.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -56,6 +57,7 @@
     "react-hook-form": "latest",
     "react-resizable-panels": "latest",
     "recharts": "latest",
+    "sharp": "^0.33.3",
     "sonner": "latest",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
