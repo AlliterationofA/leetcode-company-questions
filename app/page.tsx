@@ -603,23 +603,23 @@ export default function LeetCodeAnalytics() {
           {/* Stats Cards Row - Match Screenshot Exactly, with Date Formatting and No Overflow */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6 mb-6">
             {/* Last Updated Card (Inverted) */}
-            <Card className="flex flex-col justify-between bg-black text-white rounded-xl shadow-sm col-span-1 min-w-[180px] p-0 h-[120px] overflow-hidden">
+            <Card className="flex flex-col justify-between bg-card-foreground text-card rounded-xl shadow-sm col-span-1 min-w-[180px] p-0 h-[120px] overflow-hidden">
               <CardHeader className="flex flex-row items-start justify-between pb-1 pt-3 px-4">
                 <CardTitle className="text-xs font-medium whitespace-nowrap">Last Updated</CardTitle>
-                <Calendar className="h-4 w-4 text-white/80 flex-shrink-0" />
+                <Calendar className="h-4 w-4 text-card/80 flex-shrink-0" />
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-end px-4 pb-3 pt-0 min-h-0">
                 <div className="text-2xl font-bold leading-tight mb-1 truncate">{formatDate(data.metadata.lastUpdated)}</div>
                 <div className="flex items-center gap-2 text-xs opacity-80 flex-wrap mt-1">
                   <span className="whitespace-nowrap">Maintained by</span>
-                  <img src="https://github.com/AlliterationofA.png" alt="AlliterationofA GitHub" className="h-5 w-5 rounded-full border border-white bg-white flex-shrink-0" />
+                  <img src="https://github.com/AlliterationofA.png" alt="AlliterationofA GitHub" className="h-5 w-5 rounded-full border border-card bg-card flex-shrink-0" />
                   <a href="https://github.com/AlliterationofA" target="_blank" rel="noopener noreferrer" className="ml-1 underline truncate">@AlliterationofA</a>
                 </div>
               </CardContent>
             </Card>
 
             {/* Total Problems */}
-            <Card className="flex flex-col justify-between bg-white text-black rounded-xl shadow-sm col-span-1 min-w-[140px] p-0 h-[120px] overflow-hidden">
+            <Card className="flex flex-col justify-between bg-card text-card-foreground rounded-xl shadow-sm col-span-1 min-w-[140px] p-0 h-[120px] overflow-hidden">
               <CardHeader className="flex flex-row items-start justify-between pb-1 pt-3 px-4">
                 <CardTitle className="text-xs font-medium whitespace-nowrap">Total Problems</CardTitle>
                 <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -631,7 +631,7 @@ export default function LeetCodeAnalytics() {
             </Card>
 
             {/* Companies */}
-            <Card className="flex flex-col justify-between bg-white text-black rounded-xl shadow-sm col-span-1 min-w-[140px] p-0 h-[120px] overflow-hidden">
+            <Card className="flex flex-col justify-between bg-card text-card-foreground rounded-xl shadow-sm col-span-1 min-w-[140px] p-0 h-[120px] overflow-hidden">
               <CardHeader className="flex flex-row items-start justify-between pb-1 pt-3 px-4">
                 <CardTitle className="text-xs font-medium whitespace-nowrap">Companies</CardTitle>
                 <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -643,7 +643,7 @@ export default function LeetCodeAnalytics() {
             </Card>
 
             {/* Avg Frequency */}
-            <Card className="flex flex-col justify-between bg-white text-black rounded-xl shadow-sm col-span-1 min-w-[140px] p-0 h-[120px] overflow-hidden">
+            <Card className="flex flex-col justify-between bg-card text-card-foreground rounded-xl shadow-sm col-span-1 min-w-[140px] p-0 h-[120px] overflow-hidden">
               <CardHeader className="flex flex-row items-start justify-between pb-1 pt-3 px-4">
                 <CardTitle className="text-xs font-medium whitespace-nowrap">Avg Frequency</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -659,7 +659,7 @@ export default function LeetCodeAnalytics() {
             </Card>
 
             {/* Avg Acceptance */}
-            <Card className="flex flex-col justify-between bg-white text-black rounded-xl shadow-sm col-span-1 min-w-[140px] p-0 h-[120px] overflow-hidden">
+            <Card className="flex flex-col justify-between bg-card text-card-foreground rounded-xl shadow-sm col-span-1 min-w-[140px] p-0 h-[120px] overflow-hidden">
               <CardHeader className="flex flex-row items-start justify-between pb-1 pt-3 px-4">
                 <CardTitle className="text-xs font-medium whitespace-nowrap">Avg Acceptance</CardTitle>
                 <Code className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -675,7 +675,7 @@ export default function LeetCodeAnalytics() {
             </Card>
 
             {/* Data Source Last Updated */}
-            <Card className="flex flex-col justify-between bg-white text-black rounded-xl shadow-sm col-span-1 min-w-[180px] p-0 h-[120px] overflow-hidden">
+            <Card className="flex flex-col justify-between bg-card text-card-foreground rounded-xl shadow-sm col-span-1 min-w-[180px] p-0 h-[120px] overflow-hidden">
               <CardHeader className="flex flex-row items-start justify-between pb-1 pt-3 px-4">
                 <CardTitle className="text-xs font-medium whitespace-nowrap">Data Source Last Updated</CardTitle>
                 <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
