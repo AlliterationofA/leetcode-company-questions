@@ -27,6 +27,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChartContainer } from "@/components/ui/chart"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts"
+import Image from "next/image"
 
 // Custom components
 import { ErrorBoundary } from "@/components/ui/error-boundary"
@@ -576,7 +577,10 @@ export default function LeetCodeAnalytics() {
           {/* Header Section */}
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-2">
-              <h1 className="text-2xl font-bold md:text-3xl">LeetCode Analytics</h1>
+              <div className="flex items-center gap-3">
+                <Image src="/leetcode-analytics-logo.svg" alt="Site Logo" width={48} height={48} className="rounded" />
+                <h1 className="text-2xl font-bold md:text-3xl">LeetCode Analytics</h1>
+              </div>
               <p className="text-sm text-muted-foreground">
                 Track and analyze company-wise LeetCode problems
               </p>
