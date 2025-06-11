@@ -147,9 +147,12 @@ export function ResourcesSection({ resources }: ResourcesSectionProps) {
       {/* Resource Cards - stat card style */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {filteredResources.map(resource => (
-          <div
+          <a
             key={resource.id}
-            className="flex flex-col items-center justify-between rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm hover:shadow-md transition-all duration-200 p-4 min-h-[220px] max-w-xs mx-auto"
+            href={resource.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center justify-between rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm hover:shadow-md transition-all duration-200 p-4 min-h-[220px] max-w-xs mx-auto cursor-pointer outline-none focus:ring-2 focus:ring-primary/60 hover:border-primary/40 group"
             style={{ minWidth: 240 }}
           >
             {/* Favicon */}
@@ -167,7 +170,7 @@ export function ResourcesSection({ resources }: ResourcesSectionProps) {
               )}
             </div>
             {/* Title */}
-            <div className="font-semibold text-center text-base mb-1 truncate w-full">{resource.title}</div>
+            <div className="font-semibold text-center text-base mb-1 truncate w-full group-hover:text-primary transition-colors duration-200">{resource.title}</div>
             {/* Description */}
             <div className="text-zinc-500 dark:text-zinc-400 text-xs text-center mb-2 line-clamp-2 w-full">
               {resource.description}
@@ -178,7 +181,8 @@ export function ResourcesSection({ resources }: ResourcesSectionProps) {
                 <span
                   key={category}
                   className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-700 dark:text-zinc-200 cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-                  onClick={() => {
+                  onClick={e => {
+                    e.preventDefault();
                     if (!selectedCategories.includes(category)) {
                       setSelectedCategories(prev => [...prev, category])
                     }
@@ -188,23 +192,7 @@ export function ResourcesSection({ resources }: ResourcesSectionProps) {
                 </span>
               ))}
             </div>
-            {/* Action Button */}
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="rounded-full px-3 py-1 font-medium text-xs mt-auto"
-            >
-              <a
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1"
-              >
-                Open <ArrowUpRight className="h-4 w-4 ml-0.5" />
-              </a>
-            </Button>
-          </div>
+          </a>
         ))}
       </div>
       {filteredResources.length === 0 && (
