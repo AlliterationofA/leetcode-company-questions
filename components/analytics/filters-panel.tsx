@@ -1,6 +1,6 @@
 "use client"
 
-import { Filter, Building2, Gauge, Clock, Tag, Search, X, Layers, GitBranch, Check, ChevronsUpDown, Hash, BarChart, CheckCircle } from "lucide-react"
+import { Filter, Building2, Gauge, Clock, Tag, Search, X, Layers, GitBranch, Ampersand, Slash, Check, ChevronsUpDown, Hash, BarChart, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -204,9 +204,11 @@ export function FiltersPanel({
                         )}
                       >
                         {companyFilterMode === "and" ? (
-                          <Layers className="h-4 w-4" />
+                          // <Layers className="h-4 w-4" />
+                          <Ampersand className="h-4 w-4" />
                         ) : (
-                          <GitBranch className="h-4 w-4" />
+                          // <GitBranch className="h-4 w-4" />
+                          <Slash className="h-4 w-4" />
                         )}
                       </Button>
                     </TooltipTrigger>
@@ -462,9 +464,11 @@ export function FiltersPanel({
                         )}
                       >
                         {topicFilterMode === "and" ? (
-                          <Layers className="h-4 w-4" />
+                          // <Layers className="h-4 w-4" />
+                          <Ampersand className="h-4 w-4" />
                         ) : (
-                          <GitBranch className="h-4 w-4" />
+                          // <GitBranch className="h-4 w-4" />
+                          <Slash className="h-4 w-4" />
                         )}
                       </Button>
                     </TooltipTrigger>

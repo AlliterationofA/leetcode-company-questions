@@ -1,27 +1,24 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Search, Book, Video, Wrench, FileText, ExternalLink, ChevronDown, ChevronUp, Filter, Star, Clock, ArrowUpRight } from "lucide-react"
+import { Search, Book, Video, Wrench, FileText, ExternalLink, ChevronDown, ChevronUp, Filter, X, ChevronsUpDown, Tag } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command"
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 export interface Resource {
   id: string
@@ -40,111 +37,159 @@ interface ResourcesSectionProps {
 
 export function ResourcesSection({ resources }: ResourcesSectionProps) {
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [openTags, setOpenTags] = useState(false)
+  const [tagSearch, setTagSearch] = useState("")
 
-  const categories = useMemo(() => {
-    const uniqueCategories = new Set<string>()
+  // Combine categories and types into tags
+  const tags = useMemo(() => {
+    const uniqueTags = new Set<string>()
     resources.forEach(resource => {
-      resource.categories.forEach(category => uniqueCategories.add(category))
+      // Add type as a tag
+      uniqueTags.add(resource.type.charAt(0).toUpperCase() + resource.type.slice(1))
+      // Add categories as tags
+      resource.categories.forEach(category => uniqueTags.add(category))
     })
-    return Array.from(uniqueCategories).sort()
+    return Array.from(uniqueTags).sort()
   }, [resources])
-
-  const types = ["book", "video", "tool", "article"]
 
   const filteredResources = useMemo(() => {
     return resources.filter(resource => {
       const matchesSearch = searchTerm === "" || 
         resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         resource.description.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesCategories = selectedCategories.length === 0 ||
-        selectedCategories.some(category => resource.categories.includes(category))
-      const matchesTypes = selectedTypes.length === 0 ||
-        selectedTypes.includes(resource.type)
-      return matchesSearch && matchesCategories && matchesTypes
+      
+      const matchesTags = selectedTags.length === 0 ||
+        selectedTags.some(tag => 
+          resource.categories.includes(tag) || 
+          tag.toLowerCase() === resource.type
+        )
+      
+      return matchesSearch && matchesTags
     })
-  }, [resources, searchTerm, selectedCategories, selectedTypes])
+  }, [resources, searchTerm, selectedTags])
+
+  const activeFiltersCount = selectedTags.length > 0 ? 1 : 0
+
+  const removeTag = (tag: string) => {
+    setSelectedTags(prev => prev.filter(t => t !== tag))
+  }
 
   return (
     <div className="space-y-6">
-      {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search resources..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8"
-          />
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-full sm:w-auto">
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Filter className="h-5 w-5" />
               Filters
-              {(selectedCategories.length > 0 || selectedTypes.length > 0) && (
+              {activeFiltersCount > 0 && (
                 <Badge variant="secondary" className="ml-2">
-                  {selectedCategories.length + selectedTypes.length}
+                  {activeFiltersCount} active
                 </Badge>
               )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            <DropdownMenuLabel>Categories</DropdownMenuLabel>
-            <DropdownMenuGroup>
-              {categories.map(category => (
-                <DropdownMenuItem
-                  key={category}
-                  onSelect={(e) => {
-                    e.preventDefault()
-                    setSelectedCategories(prev =>
-                      prev.includes(category)
-                        ? prev.filter(c => c !== category)
-                        : [...prev, category]
-                    )
-                  }}
-                >
-                  <div className="flex items-center">
-                    <div className={cn(
-                      "w-2 h-2 rounded-full mr-2",
-                      selectedCategories.includes(category) ? "bg-primary" : "bg-muted"
-                    )} />
-                    {category}
-                  </div>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel>Types</DropdownMenuLabel>
-            <DropdownMenuGroup>
-              {types.map(type => (
-                <DropdownMenuItem
-                  key={type}
-                  onSelect={(e) => {
-                    e.preventDefault()
-                    setSelectedTypes(prev =>
-                      prev.includes(type)
-                        ? prev.filter(t => t !== type)
-                        : [...prev, type]
-                    )
-                  }}
-                >
-                  <div className="flex items-center">
-                    <div className={cn(
-                      "w-2 h-2 rounded-full mr-2",
-                      selectedTypes.includes(type) ? "bg-primary" : "bg-muted"
-                    )} />
-                    <span className="capitalize">{type}</span>
-                  </div>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+            </CardTitle>
+            <div className="text-sm text-muted-foreground">
+              {filteredResources.length} of {resources.length} resources
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Search and Filters */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search resources..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8"
+              />
+            </div>
 
-      {/* Resource Cards - stat card style */}
+            {/* Tags Filter */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Popover open={openTags} onOpenChange={setOpenTags}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openTags}
+                      className="w-full justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Tag className="h-4 w-4 text-muted-foreground" />
+                        {selectedTags.length > 0
+                          ? `${selectedTags.length} selected`
+                          : "Select tags"}
+                      </div>
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                    <Command>
+                      <CommandInput
+                        placeholder="Search tags..."
+                        value={tagSearch}
+                        onValueChange={setTagSearch}
+                      />
+                      <CommandEmpty>No tags found.</CommandEmpty>
+                      <CommandGroup>
+                        <div className="flex flex-wrap gap-2 p-2">
+                          {tags.map((tag) => (
+                            <CommandItem
+                              key={tag}
+                              value={tag}
+                              onSelect={() => {
+                                const newSelection = selectedTags.includes(tag)
+                                  ? selectedTags.filter(t => t !== tag)
+                                  : [...selectedTags, tag]
+                                setSelectedTags(newSelection)
+                              }}
+                              className="p-0"
+                            >
+                              <Button
+                                variant={selectedTags.includes(tag) ? "default" : "outline"}
+                                size="sm"
+                                className="h-7"
+                              >
+                                {tag}
+                                {selectedTags.includes(tag) && (
+                                  <X className="h-3 w-3 ml-1" />
+                                )}
+                              </Button>
+                            </CommandItem>
+                          ))}
+                        </div>
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              {selectedTags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {selectedTags.map((tag) => (
+                    <Button
+                      key={tag}
+                      variant="secondary"
+                      size="sm"
+                      className="h-7 px-2"
+                      onClick={() => removeTag(tag)}
+                    >
+                      {tag}
+                      <X className="h-3 w-3 ml-1" />
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Resource Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {filteredResources.map(resource => (
           <a
@@ -173,16 +218,30 @@ export function ResourcesSection({ resources }: ResourcesSectionProps) {
             <div className="text-zinc-500 dark:text-zinc-400 text-xs text-center mb-2 line-clamp-2 w-full">
               {resource.description}
             </div>
-            {/* Categories */}
+            {/* Tags */}
             <div className="flex flex-wrap gap-1 justify-center mb-3 w-full">
+              {/* Type Tag */}
+              <span
+                className="rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[11px] font-medium cursor-pointer hover:bg-primary/20 transition-colors"
+                onClick={e => {
+                  e.preventDefault();
+                  const typeTag = resource.type.charAt(0).toUpperCase() + resource.type.slice(1);
+                  if (!selectedTags.includes(typeTag)) {
+                    setSelectedTags(prev => [...prev, typeTag])
+                  }
+                }}
+              >
+                {resource.type.charAt(0).toUpperCase() + resource.type.slice(1)}
+              </span>
+              {/* Category Tags */}
               {resource.categories.map(category => (
                 <span
                   key={category}
                   className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-700 dark:text-zinc-200 cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                   onClick={e => {
                     e.preventDefault();
-                    if (!selectedCategories.includes(category)) {
-                      setSelectedCategories(prev => [...prev, category])
+                    if (!selectedTags.includes(category)) {
+                      setSelectedTags(prev => [...prev, category])
                     }
                   }}
                 >
