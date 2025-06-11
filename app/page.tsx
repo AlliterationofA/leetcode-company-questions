@@ -17,6 +17,8 @@ import {
   History,
   ChevronDown,
   ChevronUp,
+  Wrench,
+  ExternalLink,
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -34,6 +36,8 @@ import { FiltersPanel } from "@/components/analytics/filters-panel"
 import { ProblemsTable } from "@/components/analytics/problems-table"
 import { DataInfoCard } from "@/components/analytics/data-info-card"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { ResourcesSection } from "@/components/resources/resources-section"
+import { resources } from "@/data/resources"
 
 // Utilities and services
 import { logger } from "@/lib/logger"
@@ -690,7 +694,7 @@ export default function LeetCodeAnalytics() {
 
           {/* Tabs Section */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 md:space-y-6" ref={tabsRef}>
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
               <TabsTrigger value="problems" className="flex items-center gap-2">
                 <ListChecks className="h-4 w-4" />
                 <span className="hidden sm:inline">Problems</span>
@@ -702,6 +706,10 @@ export default function LeetCodeAnalytics() {
               <TabsTrigger value="analytics" className="flex items-center gap-2">
                 <BarChart2 className="h-4 w-4" />
                 <span className="hidden sm:inline">Analytics</span>
+              </TabsTrigger>
+              <TabsTrigger value="resources" className="flex items-center gap-2">
+                <Wrench className="h-4 w-4" />
+                <span className="hidden sm:inline">Resources</span>
               </TabsTrigger>
             </TabsList>
 
@@ -970,6 +978,10 @@ export default function LeetCodeAnalytics() {
                   </CardContent>
                 </Card>
               </div>
+            </TabsContent>
+
+            <TabsContent value="resources" className="space-y-4 md:space-y-6">
+              <ResourcesSection resources={resources} />
             </TabsContent>
           </Tabs>
         </div>
