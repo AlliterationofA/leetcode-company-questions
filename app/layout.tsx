@@ -5,6 +5,8 @@ import "./globals.css"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import { getCanonicalUrl } from "@/lib/utils"
+import { JsonLd } from "@/components/json-ld"
+import { generateOrganizationSchema, generateWebSiteSchema, generateWebPageSchema, generateSoftwareApplicationSchema } from "@/lib/schema"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -99,6 +101,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <JsonLd data={generateOrganizationSchema()} />
+        <JsonLd data={generateWebSiteSchema()} />
+        <JsonLd data={generateWebPageSchema()} />
+        <JsonLd data={generateSoftwareApplicationSchema()} />
+      </head>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
