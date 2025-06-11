@@ -3,10 +3,12 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import { getCanonicalUrl } from "@/lib/utils"
 import { JsonLd } from "@/components/json-ld"
 import { generateOrganizationSchema, generateWebSiteSchema, generateWebPageSchema, generateSoftwareApplicationSchema } from "@/lib/schema"
+import { beforeSendAnalytics } from "@/lib/analytics"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -115,7 +117,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <Analytics />
+          <Analytics 
+            mode="auto"
+            debug={process.env.NODE_ENV === 'development'}
+            beforeSend={beforeSendAnalytics}
+          />
+          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>
