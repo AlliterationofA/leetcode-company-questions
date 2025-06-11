@@ -1,5 +1,5 @@
 import { logger } from "./logger"
-import { NetworkError, handleError } from "./error-handler"
+import { AppError } from "./error-handler"
 
 interface GitHubCommit {
   sha: string
@@ -32,6 +32,8 @@ interface GitHubRepositoryInfo {
 
 class GitHubApiClient {
   private readonly baseUrl = "https://api.github.com"
+  private readonly owner = "yourusername"
+  private readonly repo = "leetcode-company-questions"
 
   async getLastCommitInfo(
     owner: string = "AlliterationofA",
@@ -74,13 +76,13 @@ class GitHubApiClient {
             commitUrl: `https://github.com/${owner}/${repo}/commits`,
           }
         }
-        throw new NetworkError(`GitHub API error: ${response.status} ${response.statusText}`)
+        throw new AppError(`GitHub API error: ${response.status} ${response.statusText}`)
       }
 
       const commits = await response.json()
 
       if (!commits || commits.length === 0) {
-        throw new NetworkError("No commits found for the CSV file")
+        throw new AppError("No commits found for the CSV file")
       }
 
       const lastCommit = commits[0]
@@ -97,7 +99,7 @@ class GitHubApiClient {
         commitUrl: lastCommit.html_url,
       }
     } catch (error) {
-      const appError = handleError(error, "GitHub API")
+      const appError = AppError.from(error, "GitHub API")
       logger.error("Failed to fetch GitHub commit info", appError)
 
       // Return fallback data instead of throwing
@@ -137,7 +139,7 @@ class GitHubApiClient {
       })
 
       if (!response.ok) {
-        throw new NetworkError(`GitHub API error: ${response.status} ${response.statusText}`)
+        throw new AppError(`GitHub API error: ${response.status} ${response.statusText}`)
       }
 
       const repoData: GitHubRepositoryInfo = await response.json()
@@ -157,9 +159,45 @@ class GitHubApiClient {
         forks_count: repoData.forks_count,
       }
     } catch (error) {
-      const appError = handleError(error, "GitHub Repository API")
+      const appError = AppError.from(error, "GitHub Repository API")
       logger.error("Failed to fetch GitHub repository info", appError)
       throw appError
+    }
+  }
+
+  async getLastUpdated(): Promise<string> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/repos/${this.owner}/${this.repo}/commits?path=codedata.csv&per_page=1`
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const [latestCommit] = await response.json() as { commit: { committer: { date: string } } }[]
+      return latestCommit.commit.committer.date
+    } catch (error) {
+      logger.error('Error fetching last updated date from GitHub:', error)
+      throw new AppError('Failed to fetch last updated date', { cause: error })
+    }
+  }
+
+  async getFileContent(path: string): Promise<string> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/repos/${this.owner}/${this.repo}/contents/${path}`
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json() as { content: string }
+      return Buffer.from(data.content, 'base64').toString()
+    } catch (error) {
+      logger.error(`Error fetching file content from GitHub: ${path}`, error)
+      throw new AppError('Failed to fetch file content', { cause: error })
     }
   }
 }

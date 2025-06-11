@@ -5,11 +5,19 @@ export class AppError extends Error {
   public readonly statusCode: number
   public readonly isOperational: boolean
 
-  constructor(message: string, code: string, statusCode = 500, isOperational = true) {
+  constructor(message: string, code: string, statusCode = 500, isOperational = true, options?: { cause?: unknown }) {
     super(message)
+    this.name = 'AppError'
     this.code = code
     this.statusCode = statusCode
     this.isOperational = isOperational
+
+    if (options?.cause) {
+      const causeMessage = options.cause instanceof Error 
+        ? options.cause.message 
+        : String(options.cause)
+      this.message = `${message}: ${causeMessage}`
+    }
 
     Error.captureStackTrace(this, this.constructor)
   }
@@ -39,33 +47,13 @@ export class FileError extends AppError {
   }
 }
 
-export const handleError = (error: unknown, context = "Unknown"): AppError => {
-  logger.error(`Error in ${context}`, error instanceof Error ? error : new Error(String(error)))
-
+export function handleError(error: unknown, context: string): AppError {
   if (error instanceof AppError) {
     return error
   }
 
-  if (error instanceof Error) {
-    // Network errors
-    if (error.message.includes("fetch") || error.message.includes("network")) {
-      return new NetworkError(`Network error: ${error.message}`)
-    }
-
-    // File errors
-    if (error.message.includes("file") || error.message.includes("upload")) {
-      return new FileError(`File error: ${error.message}`)
-    }
-
-    // JSON parsing errors
-    if (error.message.includes("JSON") || error.message.includes("parse")) {
-      return new DataProcessingError(`Data parsing error: ${error.message}`)
-    }
-
-    return new AppError(error.message, "UNKNOWN_ERROR", 500, false)
-  }
-
-  return new AppError("An unexpected error occurred", "UNKNOWN_ERROR", 500, false)
+  const message = error instanceof Error ? error.message : String(error)
+  return new AppError(`${context} error: ${message}`, "UNKNOWN_ERROR", 500, false)
 }
 
 export const withErrorHandling = <T extends any[], R>(fn: (...args: T) => Promise<R>, context: string) => {

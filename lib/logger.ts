@@ -29,28 +29,29 @@ class Logger {
     }
   }
 
-  debug(message: string, data?: any) {
-    const entry = this.formatMessage("debug", message, data)
-    this.addLog(entry)
-    console.debug(`[DEBUG] ${message}`, data)
+  info(message: string, ...args: unknown[]) {
+    console.log(`[INFO] ${message}`, ...args)
   }
 
-  info(message: string, data?: any) {
-    const entry = this.formatMessage("info", message, data)
-    this.addLog(entry)
-    console.info(`[INFO] ${message}`, data)
+  error(message: string, error?: Error | unknown) {
+    if (error instanceof Error) {
+      console.error(`[ERROR] ${message}:`, error.message)
+      if (error.stack) {
+        console.error(error.stack)
+      }
+    } else {
+      console.error(`[ERROR] ${message}:`, error)
+    }
   }
 
-  warn(message: string, data?: any) {
-    const entry = this.formatMessage("warn", message, data)
-    this.addLog(entry)
-    console.warn(`[WARN] ${message}`, data)
+  warn(message: string, ...args: unknown[]) {
+    console.warn(`[WARN] ${message}`, ...args)
   }
 
-  error(message: string, error?: Error, data?: any) {
-    const entry = this.formatMessage("error", message, data, error)
-    this.addLog(entry)
-    console.error(`[ERROR] ${message}`, error, data)
+  debug(message: string, ...args: unknown[]) {
+    if (process.env.NODE_ENV === 'development') {
+      console.debug(`[DEBUG] ${message}`, ...args)
+    }
   }
 
   getLogs(level?: LogLevel): LogEntry[] {

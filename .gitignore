@@ -31,4 +31,5 @@ pnpm-lock.yaml
 package.json
 package-lock.json
 .cursor/rules/rule.mdc
-.cursor/scratchpad.md
+# .cursor/scratchpad.md
+.cursor/rules/frontend.mdc

@@ -1,55 +1,53 @@
-import { CheckCircle, AlertCircle, Loader2, XCircle } from "lucide-react"
-import { cn } from "@/lib/utils"
+'use client'
 
-interface StatusIndicatorProps {
-  status: "loading" | "success" | "error" | "warning"
-  message?: string
-  className?: string
+import { RefreshCw } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
+
+export interface StatusIndicatorProps {
+  loading: boolean
+  error: string | null
+  success: string | null
+  lastUpdated: string | null
+  onRefresh: () => void
 }
 
-export function StatusIndicator({ status, message, className }: StatusIndicatorProps) {
-  const statusConfig = {
-    loading: {
-      icon: Loader2,
-      className: "text-blue-500 animate-spin",
-      bgClassName: "bg-blue-50 border-blue-200",
-    },
-    success: {
-      icon: CheckCircle,
-      className: "text-green-600",
-      bgClassName: "bg-green-50 border-green-200",
-    },
-    error: {
-      icon: XCircle,
-      className: "text-red-600",
-      bgClassName: "bg-red-50 border-red-200",
-    },
-    warning: {
-      icon: AlertCircle,
-      className: "text-yellow-600",
-      bgClassName: "bg-yellow-50 border-yellow-200",
-    },
-  }
-
-  const config = statusConfig[status]
-  const Icon = config.icon
-
+export function StatusIndicator({
+  loading,
+  error,
+  success,
+  lastUpdated,
+  onRefresh
+}: StatusIndicatorProps) {
   return (
-    <div className={cn("flex items-center gap-2 p-3 rounded-lg border", config.bgClassName, className)}>
-      <Icon className={cn("h-4 w-4", config.className)} />
-      {message && (
-        <span
-          className={cn(
-            "text-sm font-medium",
-            status === "success" && "text-green-800",
-            status === "error" && "text-red-800",
-            status === "warning" && "text-yellow-800",
-            status === "loading" && "text-blue-800",
-          )}
-        >
-          {message}
-        </span>
+    <div className="flex items-center gap-4">
+      {/* Status message */}
+      {(error || success) && (
+        <div className={`text-sm ${error ? 'text-destructive' : 'text-success'}`}>
+          {error || success}
+        </div>
       )}
+
+      {/* Last updated */}
+      {lastUpdated && !loading && !error && (
+        <div className="text-sm text-muted-foreground">
+          Last updated: {new Date(lastUpdated).toLocaleString()}
+        </div>
+      )}
+
+      {/* Refresh button */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onRefresh}
+        disabled={loading}
+      >
+        {loading ? (
+          <LoadingSpinner size="sm" />
+        ) : (
+          <RefreshCw className="h-4 w-4" />
+        )}
+      </Button>
     </div>
   )
 }
