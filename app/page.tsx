@@ -33,6 +33,7 @@ import { StatusIndicator } from "@/components/ui/status-indicator"
 import { FiltersPanel } from "@/components/analytics/filters-panel"
 import { ProblemsTable } from "@/components/analytics/problems-table"
 import { DataInfoCard } from "@/components/analytics/data-info-card"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 // Utilities and services
 import { logger } from "@/lib/logger"
@@ -576,7 +577,7 @@ export default function LeetCodeAnalytics() {
                 Track and analyze company-wise LeetCode problems
               </p>
             </div>
-            <div className="flex flex-col gap-2 sm:flex-row w-full sm:w-auto">
+            <div className="flex flex-col gap-2 sm:flex-row w-full sm:w-auto items-center">
               <Input
                 placeholder="Search problems..."
                 value={searchTerm}
@@ -595,6 +596,7 @@ export default function LeetCodeAnalytics() {
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh Data
               </Button>
+              <ThemeToggle />
             </div>
           </div>
 
