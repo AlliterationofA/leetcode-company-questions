@@ -30,3 +30,5 @@ next-env.d.ts
 pnpm-lock.yaml
 package.json
 package-lock.json
+.cursor/rules/rule.mdc
+.cursor/scratchpad.md

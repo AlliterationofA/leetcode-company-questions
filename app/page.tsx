@@ -575,17 +575,25 @@ export default function LeetCodeAnalytics() {
       <div className="min-h-screen bg-background">
         <div className="flex flex-col gap-4 p-4 md:p-6">
           {/* Header Section */}
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-3">
-                <Image src="/leetcode-analytics-logo.svg" alt="Site Logo" width={48} height={48} className="rounded" />
-                <h1 className="text-2xl font-bold md:text-3xl">LeetCode Analytics</h1>
+          <header
+            className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between w-full px-2 sm:px-0"
+            role="banner"
+            aria-label="LeetCode Analytics main header"
+          >
+            {/* Left: Logo, Title, Subtitle */}
+            <div className="flex flex-row items-center gap-3 sm:gap-4 w-full md:w-auto min-w-0">
+              <Image src="/leetcode-analytics-logo.svg" alt="Site Logo" width={48} height={48} className="rounded" aria-label="LeetCode Analytics Logo" />
+              <div className="flex flex-col gap-1 min-w-0">
+                <h1 className="text-2xl font-bold md:text-3xl tracking-tight drop-shadow-sm truncate" aria-label="LeetCode Analytics Title">
+                  LeetCode <span className="text-primary">Analytics</span>
+                </h1>
+                <p className="text-sm text-muted-foreground truncate" aria-label="App subtitle">
+                  Track and analyze company-wise LeetCode problems
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Track and analyze company-wise LeetCode problems
-              </p>
             </div>
-            <div className="flex flex-col gap-2 sm:flex-row w-full sm:w-auto items-center">
+            {/* Right: Search, Refresh, Theme */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center w-full sm:w-auto md:justify-end mt-2 md:mt-0 min-w-0">
               <Input
                 placeholder="Search problems..."
                 value={searchTerm}
@@ -598,15 +606,28 @@ export default function LeetCodeAnalytics() {
                     }
                   }
                 }}
-                className="w-full sm:w-[400px]"
+                className="w-full sm:w-[300px] md:w-[400px] rounded-lg shadow-sm px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none transition-all duration-150 hover:shadow-md min-w-0"
+                aria-label="Search problems"
               />
-              <Button variant="outline" onClick={() => handleCSVProcessing(true)} disabled={processing} className="w-full sm:w-auto">
-                <RefreshCw className="h-4 w-4 mr-2" />
+              <Button
+                variant="default"
+                onClick={() => handleCSVProcessing(true)}
+                disabled={processing}
+                className="w-full sm:w-auto font-semibold rounded-lg px-5 py-2 shadow-sm transition-colors duration-150 focus:ring-2 focus:ring-primary focus:outline-none hover:bg-primary/90 min-w-[120px]"
+                aria-label="Refresh Data"
+              >
+                {processing ? (
+                  <span className="animate-spin mr-2 h-4 w-4 border-2 border-t-transparent border-white rounded-full inline-block align-middle" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                )}
                 Refresh Data
               </Button>
-              <ThemeToggle />
+              <span className="focus-visible:ring-2 focus-visible:ring-primary rounded transition-all duration-150 mt-1 sm:mt-0">
+                <ThemeToggle />
+              </span>
             </div>
-          </div>
+          </header>
 
           {/* Stats Cards Row - Match Screenshot Exactly, with Date Formatting and No Overflow */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6 mb-6">
