@@ -367,10 +367,9 @@ export async function GET(request: Request) {
     const difficulty = searchParams.get("difficulty")
     const timeframe = searchParams.get("timeframe")
     const search = searchParams.get("search")
-    const limit = Number.parseInt(searchParams.get("limit") || "10000")
     const offset = Number.parseInt(searchParams.get("offset") || "0")
 
-    console.log("Filter parameters:", { company, difficulty, timeframe, search, limit, offset })
+    console.log("Filter parameters:", { company, difficulty, timeframe, search, offset })
 
     // Load the CSV data from GitHub for filtering
     let csvContent: string
@@ -527,8 +526,7 @@ export async function GET(request: Request) {
 
     // Apply pagination
     const start = offset
-    const end = limit ? start + limit : questions.length
-    const paginatedQuestions = questions.slice(start, end)
+    const paginatedQuestions = questions.slice(start)
 
     console.log(`Filtered to ${questions.length} questions, showing ${paginatedQuestions.length}`)
 

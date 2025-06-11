@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://leetcode-company-questions.vercel.app
+
+# Sitemaps
+Sitemap: https://leetcode-company-questions.vercel.app/sitemap.xml

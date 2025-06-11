@@ -1,7 +1,6 @@
 "use client"
 
-import { Filter, Building2, Gauge, Clock, Tag, Search, X, Layers, GitBranch, Check, ChevronsUpDown, Hash, BarChart, CheckCircle } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Filter, Building2, Gauge, Clock, Tag, Search, X, Layers, GitBranch, Ampersand, Slash, Check, ChevronsUpDown, Hash, BarChart, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -10,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef } from "react"
 
 interface FiltersPanelProps {
   selectedCompanies: string[]
@@ -104,6 +103,11 @@ export function FiltersPanel({
     onTopicsChange(selectedTopics.filter(t => t !== topic))
   }
 
+  const companyFilterRef = useRef<HTMLDivElement>(null)
+  const difficultiesFilterRef = useRef<HTMLDivElement>(null)
+  const timeframesFilterRef = useRef<HTMLDivElement>(null)
+  const topicsFilterRef = useRef<HTMLDivElement>(null)
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -126,7 +130,7 @@ export function FiltersPanel({
         {/* Row 1: Main dropdown filters */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Companies Filter */}
-          <div className="space-y-2">
+          <div className="space-y-2" ref={companyFilterRef}>
             <div className="flex items-center gap-2">
               <Popover open={openCompany} onOpenChange={setOpenCompany}>
                 <PopoverTrigger asChild>
@@ -145,7 +149,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" side="bottom" sideOffset={4} sticky="always" collisionBoundary={companyFilterRef.current} avoidCollisions={false}>
                   <Command>
                     <CommandInput
                       placeholder="Search companies..."
@@ -200,9 +204,11 @@ export function FiltersPanel({
                         )}
                       >
                         {companyFilterMode === "and" ? (
-                          <Layers className="h-4 w-4" />
+                          // <Layers className="h-4 w-4" />
+                          <Ampersand className="h-4 w-4" />
                         ) : (
-                          <GitBranch className="h-4 w-4" />
+                          // <GitBranch className="h-4 w-4" />
+                          <Slash className="h-4 w-4" />
                         )}
                       </Button>
                     </TooltipTrigger>
@@ -236,7 +242,7 @@ export function FiltersPanel({
           </div>
 
           {/* Difficulties Filter */}
-          <div className="space-y-2">
+          <div className="space-y-2" ref={difficultiesFilterRef}>
             <div className="flex items-center gap-2">
               <Popover>
                 <PopoverTrigger asChild>
@@ -256,7 +262,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" side="bottom" sideOffset={4} sticky="always" collisionBoundary={difficultiesFilterRef.current} avoidCollisions={false}>
                   <Command>
                     <CommandGroup>
                       <div className="flex flex-wrap gap-2 p-2">
@@ -318,7 +324,7 @@ export function FiltersPanel({
           </div>
 
           {/* Timeframes Filter */}
-          <div className="space-y-2">
+          <div className="space-y-2" ref={timeframesFilterRef}>
             <div className="flex items-center gap-2">
               <Popover>
                 <PopoverTrigger asChild>
@@ -336,7 +342,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" side="bottom" sideOffset={4} sticky="always" collisionBoundary={timeframesFilterRef.current} avoidCollisions={false}>
                   <Command>
                     <CommandGroup className="max-h-[300px] overflow-auto p-2">
                       <div className="flex flex-wrap gap-2">
@@ -384,7 +390,7 @@ export function FiltersPanel({
           </div>
 
           {/* Topics Filter */}
-          <div className="space-y-2">
+          <div className="space-y-2" ref={topicsFilterRef}>
             <div className="flex items-center gap-2">
               <Popover open={openTopic} onOpenChange={setOpenTopic}>
                 <PopoverTrigger asChild>
@@ -403,7 +409,7 @@ export function FiltersPanel({
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" sideOffset={0}>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start" side="bottom" sideOffset={4} sticky="always" collisionBoundary={topicsFilterRef.current} avoidCollisions={false}>
                   <Command>
                     <CommandInput
                       placeholder="Search topics..."
@@ -458,9 +464,11 @@ export function FiltersPanel({
                         )}
                       >
                         {topicFilterMode === "and" ? (
-                          <Layers className="h-4 w-4" />
+                          // <Layers className="h-4 w-4" />
+                          <Ampersand className="h-4 w-4" />
                         ) : (
-                          <GitBranch className="h-4 w-4" />
+                          // <GitBranch className="h-4 w-4" />
+                          <Slash className="h-4 w-4" />
                         )}
                       </Button>
                     </TooltipTrigger>
@@ -494,8 +502,8 @@ export function FiltersPanel({
           </div>
         </div>
         {/* Row 2: Range filters and cross-company button */}
-        <div className="flex flex-col lg:flex-row gap-4 items-start mt-2">
-          <div className="flex flex-1 gap-4">
+        <div className="flex flex-col gap-4 lg:flex-row items-start lg:items-center mt-2">
+          <div className="flex flex-col gap-3 w-full lg:flex-row lg:items-center lg:gap-4 lg:p-2 p-3 rounded-md border bg-muted/30 lg:bg-transparent lg:border-0">
             {/* Occurrences Range */}
             <div>
               <label className="block text-xs font-semibold text-muted-foreground mb-1 flex items-center gap-1">
@@ -507,7 +515,7 @@ export function FiltersPanel({
                   placeholder={occurrencesStats.min.toString()}
                   value={occurrencesRange.min === "" ? occurrencesStats.min : occurrencesRange.min}
                   min={0}
-                  className="w-20 h-10"
+                  className="w-14 h-10 sm:w-20"
                   onChange={e => onOccurrencesRangeChange({ min: e.target.value === "" ? "" : Number(e.target.value), max: occurrencesRange.max })}
                 />
                 <span className="text-muted-foreground">—</span>
@@ -516,11 +524,12 @@ export function FiltersPanel({
                   placeholder={occurrencesStats.max.toString()}
                   value={occurrencesRange.max === "" ? occurrencesStats.max : occurrencesRange.max}
                   min={0}
-                  className="w-20 h-10"
+                  className="w-14 h-10 sm:w-20"
                   onChange={e => onOccurrencesRangeChange({ min: occurrencesRange.min, max: e.target.value === "" ? "" : Number(e.target.value) })}
                 />
               </div>
             </div>
+
             {/* Frequency Range */}
             <div>
               <label className="block text-xs font-semibold text-muted-foreground mb-1 flex items-center gap-1">
@@ -532,7 +541,7 @@ export function FiltersPanel({
                   placeholder={frequencyStats.min.toString()}
                   value={frequencyRange.min === "" ? frequencyStats.min : frequencyRange.min}
                   min={0}
-                  className="w-20 h-10"
+                  className="w-14 h-10 sm:w-20"
                   onChange={e => onFrequencyRangeChange({ min: e.target.value === "" ? "" : Number(e.target.value), max: frequencyRange.max })}
                 />
                 <span className="text-muted-foreground">—</span>
@@ -541,11 +550,12 @@ export function FiltersPanel({
                   placeholder={frequencyStats.max.toString()}
                   value={frequencyRange.max === "" ? frequencyStats.max : frequencyRange.max}
                   min={0}
-                  className="w-20 h-10"
+                  className="w-14 h-10 sm:w-20"
                   onChange={e => onFrequencyRangeChange({ min: frequencyRange.min, max: e.target.value === "" ? "" : Number(e.target.value) })}
                 />
               </div>
             </div>
+
             {/* Acceptance % Range */}
             <div>
               <label className="block text-xs font-semibold text-muted-foreground mb-1 flex items-center gap-1">
@@ -558,7 +568,7 @@ export function FiltersPanel({
                   value={acceptanceRange.min === "" ? acceptanceStats.min : acceptanceRange.min}
                   min={0}
                   max={100}
-                  className="w-20 h-10"
+                  className="w-14 h-10 sm:w-20"
                   onChange={e => onAcceptanceRangeChange({ min: e.target.value === "" ? "" : Number(e.target.value), max: acceptanceRange.max })}
                 />
                 <span className="text-muted-foreground">—</span>
@@ -568,19 +578,19 @@ export function FiltersPanel({
                   value={acceptanceRange.max === "" ? acceptanceStats.max : acceptanceRange.max}
                   min={0}
                   max={100}
-                  className="w-20 h-10"
+                  className="w-14 h-10 sm:w-20"
                   onChange={e => onAcceptanceRangeChange({ min: acceptanceRange.min, max: e.target.value === "" ? "" : Number(e.target.value) })}
                 />
               </div>
             </div>
           </div>
-          <div className="flex-shrink-0 mt-2 lg:mt-0">
+          <div className="flex-shrink-0 mt-2 lg:mt-0 lg:ml-4 lg:self-center">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant={showMultiCompany ? "default" : "outline"} size="sm" onClick={onMultiCompanyToggle}>
                     <Filter className="h-4 w-4 mr-2" />
-                    Cross-Company Only
+                    Exclude Single Occurences
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
