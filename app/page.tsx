@@ -545,6 +545,30 @@ export default function LeetCodeAnalytics() {
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
   }
 
+  // Helper function for company logo URLs with multiple fallbacks
+  const getCompanyLogoUrl = (companyName: string) => {
+    const domain = companyName.toLowerCase().replace(/\s+/g, '')
+    return `https://logo.clearbit.com/${domain}.com`
+  }
+
+  const handleLogoError = (e: React.SyntheticEvent<HTMLImageElement>, companyName: string) => {
+    const img = e.currentTarget
+    const normalizedName = companyName.toLowerCase().replace(/\s+/g, '')
+    
+    if (!img.dataset.fallbackAttempt) {
+      img.dataset.fallbackAttempt = '1'
+      // Try alternative domain formats (.io)
+      img.src = `https://logo.clearbit.com/${normalizedName}.io`
+    } else if (img.dataset.fallbackAttempt === '1') {
+      img.dataset.fallbackAttempt = '2'
+      // Try Google's favicon service
+      img.src = `https://www.google.com/s2/favicons?domain=${normalizedName}.com&sz=128`
+    } else {
+      // Final fallback to UI Avatars
+      img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(companyName)}&background=random&size=80`
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -845,12 +869,10 @@ export default function LeetCodeAnalytics() {
                     <CardHeader>
                       <div className="flex items-center gap-3">
                         <img 
-                          src={`https://logo.clearbit.com/${company.name.toLowerCase().replace(/\s+/g, '')}.com`}
+                          src={getCompanyLogoUrl(company.name)}
                           alt={`${company.name} logo`}
-                          className="w-8 h-8 rounded"
-                          onError={(e) => {
-                            e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(company.name) + '&background=random';
-                          }}
+                          className="w-8 h-8 rounded object-contain bg-white"
+                          onError={(e) => handleLogoError(e, company.name)}
                         />
                         <div>
                           <CardTitle className="text-lg">{company.name}</CardTitle>
