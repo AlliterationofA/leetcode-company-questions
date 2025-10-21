@@ -58,6 +58,7 @@ export default function LeetCodeAnalytics() {
   const [success, setSuccess] = useState<string | null>(null)
 
   const [leetcodeRepoLastUpdated, setLeetcodeRepoLastUpdated] = useState<string | null>(null)
+  const [thisRepoLastUpdated, setThisRepoLastUpdated] = useState<string | null>(null)
 
   // Filters and sorting
   const [searchTerm, setSearchTerm] = useState("")
@@ -288,6 +289,13 @@ export default function LeetCodeAnalytics() {
         "leetcode-company-wise-problems"
       )
       setLeetcodeRepoLastUpdated(leetcodeRepoInfo.lastUpdated)
+
+      // Fetch last commit for THIS repo (AlliterationofA/leetcode-company-questions)
+      const thisRepoInfo = await githubApi.getLastCommitInfo(
+        "AlliterationofA",
+        "leetcode-company-questions"
+      )
+      setThisRepoLastUpdated(thisRepoInfo.lastUpdated)
     } catch (error) {
       const errorMessage = error instanceof AppError ? error.message : "Failed to process CSV data"
       logger.error("CSV processing failed", error instanceof Error ? error : new Error(String(error)))
@@ -638,11 +646,16 @@ export default function LeetCodeAnalytics() {
                 <Calendar className="h-4 w-4 text-card/80 flex-shrink-0" />
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-end px-4 pb-3 pt-0 min-h-0">
-                <div className="text-2xl font-bold leading-tight mb-1 truncate">{formatDate(data.metadata.lastUpdated)}</div>
-                <div className="flex items-center gap-2 text-xs opacity-80 flex-wrap mt-1">
-                  <span className="whitespace-nowrap">Maintained by</span>
-                  <img src="https://github.com/AlliterationofA.png" alt="AlliterationofA GitHub" className="h-5 w-5 rounded-full border border-card bg-card flex-shrink-0" />
-                  <a href="https://github.com/AlliterationofA" target="_blank" rel="noopener noreferrer" className="ml-1 underline truncate">@AlliterationofA</a>
+                <div className="text-2xl font-bold leading-tight mb-1 truncate">{formatDate(thisRepoLastUpdated || data.metadata.lastUpdated)}</div>
+                <div className="text-xs opacity-80 mt-1">
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span>Maintained by</span>
+                    <a href="https://github.com/AlliterationofA" target="_blank" rel="noopener noreferrer" className="underline truncate">@AlliterationofA</a>
+                    <img src="https://github.com/AlliterationofA.png" alt="AlliterationofA GitHub" className="h-3 w-3 rounded-full border border-card bg-card flex-shrink-0" />
+                    <span className="text-xs">&</span>
+                    <a href="https://github.com/Ashraf8ila" target="_blank" rel="noopener noreferrer" className="underline truncate">@Ashraf8ila</a>
+                    <img src="https://github.com/Ashraf8ila.png" alt="Ashraf8ila GitHub" className="h-3 w-3 rounded-full border border-card bg-card flex-shrink-0" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
